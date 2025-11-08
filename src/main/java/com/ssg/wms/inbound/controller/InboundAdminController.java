@@ -1,6 +1,6 @@
 package com.ssg.wms.inbound.controller;
 
-import com.ssg.wms.inbound.service.InboundService;
+import com.ssg.wms.inbound.service.InboundMemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 
@@ -8,11 +8,7 @@ import org.springframework.stereotype.Controller;
 @RequiredArgsConstructor
 public class InboundAdminController {
 
-    private final InboundService inboundService;
-
-    // 입고 요청 화면 이동
-
-    // 입고 요청
+    private final InboundMemberService inboundService;
 
     // 입고 요청 목록 조회 (사용자용 - 자신이 등록한 입고 요청만 조회 가능) -> 자신이 속한 브랜드 별로 조회가 가능할까?
 

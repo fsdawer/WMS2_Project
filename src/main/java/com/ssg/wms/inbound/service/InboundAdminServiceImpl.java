@@ -1,13 +1,14 @@
-package com.ssg.wms.inbound.repository;
+package com.ssg.wms.inbound.service;
 
 import com.ssg.wms.inbound.dto.InboundRequestDTO;
 
-public interface InboundMemberMapper {
+import java.util.List;
+
+public class InboundAdminServiceImpl implements InboundAdminService {
 
     // 입고 요청 화면 이동
 
     // 입고 요청
-    void insertInbound(InboundRequestDTO inboundRequestDTO);
 
     // 입고 요청 목록 조회 (관리자용 - 브랜드, 상태 파라미터로 받아서 검색)
 
@@ -17,4 +18,5 @@ public interface InboundMemberMapper {
 
     // 입고 요청 취소
 
+    
 }

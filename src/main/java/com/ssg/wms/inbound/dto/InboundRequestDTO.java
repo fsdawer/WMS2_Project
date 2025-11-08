@@ -1,10 +1,13 @@
 package com.ssg.wms.inbound.dto;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.ToString;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@ToString
 public class InboundRequestDTO {
 
     private int inboundId;
@@ -12,11 +15,13 @@ public class InboundRequestDTO {
     private String warehouseName;
     private int memberId;
     private String memberName;
-    private String inboundStatus;
+    private long staffId;
+    private String staffName;
+    private String inboundStatus; // request, cancelled, approved, rejected
     private String inboundRejectReason;
-    private LocalDateTime inboundRequestDateTime;
-    private LocalDateTime inboundUpdateDateTime;
-    private LocalDateTime inboundDateTime;
+    private LocalDateTime inboundRequestedAt;
+    private LocalDateTime inboundUpdatedAt;
+    private LocalDateTime inboundAt;
 
 }
 
