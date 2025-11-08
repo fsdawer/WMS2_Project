@@ -1,9 +1,5 @@
 package com.ssg.wms.inbound.service;
 
-import com.ssg.wms.inbound.dto.InboundRequestDTO;
-
-import java.util.List;
-
 public class InboundAdminServiceImpl implements InboundAdminService {
 
     // 입고 요청 화면 이동
@@ -18,5 +14,5 @@ public class InboundAdminServiceImpl implements InboundAdminService {
 
     // 입고 요청 취소
 
-    
+
 }

@@ -3,18 +3,21 @@ package com.ssg.wms.inbound.domain;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Data
 public class InboundVO {
 
     private int inboundId;
     private int warehouseId;
-    private long staffId;
-    private long memberId;
+    private int staffId;
+    private int memberId;
     private String inboundStatus;         // request, cancelled, approved, rejected
     private String inboundRejectReason;
     private LocalDateTime inboundRequestedAt;
     private LocalDateTime inboundUpdatedAt;
     private LocalDateTime inboundAt;
+
+    private List<InboundItemVO> inboundItems;
 
 }

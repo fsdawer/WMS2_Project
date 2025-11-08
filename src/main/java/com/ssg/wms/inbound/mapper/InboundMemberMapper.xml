@@ -6,16 +6,30 @@
 
 
 <!--    // 입고 요청-->
-    <insert id="insertInbound">
+    <insert id="insertInbound" parameterType="com.ssg.wms.inbound.domain.InboundVO" useGeneratedKeys="true" keyProperty="inboundId">>
         <selectKey order="AFTER" keyProperty="inboundId" resultType="long">
             SELECT LAST_INSERT_ID()
         </selectKey>
 
-        insert into inbound (
+        INSERT INTO inbound (
+        warehouse_id,
         staff_id,
-        member_id
+        member_id,
+        inbound_status,
+        inbound_reject_reason,
+        inbound_requested_at,
+        inbound_updated_at,
+        inbound_at
         )
-        values (#{title},#{content},#{writer})
+        VALUES (
+        #{warehouseId},
+        #{staffId},
+        #{memberId},
+        #{inboundStatus},
+        #{inboundRejectReason},
+        #{inboundRequestedAt},
+        #{inboundUpdatedAt},
+        #{inboundAt})
     </insert>
 
     <insert id="insertInboundItem">
@@ -28,6 +42,35 @@
 <!--    // 입고 요청 목록 조회 (관리자용 - 브랜드, 상태 파라미터로 받아서 검색)-->
 
 <!--    // 입고 요청 단건 조회-->
+    <select id="selectInboundWithItems" resultMap="InboundWithItemsResultMap" parameterType="int">
+        SELECT
+        i.inbound_id, i.warehouse_id, w.warehouse_name,
+        i.member_id, m.member_name,
+        i.inbound_status,
+        ii.item_id, ii.product_id, p.product_name, ii.quantity, ii.unit
+        FROM inbound i
+        JOIN warehouse w ON i.warehouse_id = w.warehouse_id
+        JOIN member m ON i.member_id = m.member_id
+        LEFT JOIN inbound_item ii ON i.inbound_id = ii.inbound_id
+        LEFT JOIN product p ON ii.product_id = p.product_id
+        WHERE i.inbound_id = #{inboundId}
+    </select>
+
+    <resultMap id="InboundWithItemsResultMap" type="com.example.wms.dto.InboundResponseDTO">
+        <id property="inboundId" column="inbound_id"/>
+        <result property="warehouseId" column="warehouse_id"/>
+        <result property="warehouseName" column="warehouse_name"/>
+        <result property="memberId" column="member_id"/>
+        <result property="memberName" column="member_name"/>
+        <result property="inboundStatus" column="inbound_status"/>
+        <collection property="inboundItems" ofType="com.example.wms.dto.InboundItemDTO">
+            <id property="itemId" column="item_id"/>
+            <result property="productId" column="product_id"/>
+            <result property="productName" column="product_name"/>
+            <result property="quantity" column="quantity"/>
+            <result property="unit" column="unit"/>
+        </collection>
+    </resultMap>
 
 <!--    // 입고 요청 수정-->
 
