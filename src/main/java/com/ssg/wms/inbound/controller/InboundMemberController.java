@@ -1,9 +1,11 @@
 package com.ssg.wms.inbound.controller;
 
 import com.ssg.wms.inbound.dto.InboundRequestDTO;
+import com.ssg.wms.product_ehs.dto.CategoryDTO;
 import com.ssg.wms.product_ehs.dto.ProductDTO;
 import com.ssg.wms.inbound.service.InboundMemberService;
 import com.ssg.wms.product_ehs.service.ProductServiceImpl;
+import com.sun.org.apache.xpath.internal.operations.Mod;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -29,7 +31,7 @@ public class InboundMemberController {
 //    private final WarehouseService warehouseService
 
     // 입고 요청 화면 이동
-    @GetMapping("/member/inbound/request")
+    @GetMapping("/inbound/member/request")
     public String getInboundRequestForm(HttpSession session, Model model) {
         // 로그인한 사용자의 user_id를 자동으로 가져오도록
         Integer memberId = (Integer) session.getAttribute("loginMemberId");
@@ -43,25 +45,31 @@ public class InboundMemberController {
         model.addAttribute("parterId", parterId);
         model.addAttribute("partnerName", partnerName);
 
-        // 선택할 상품 데이터 로드
+        // 입고요청시에 볼 상품 리스트 데이터 로드
         List<ProductDTO> products = productService.getProductsByPartner(parterId);
         model.addAttribute("products", products);
+        // 카테고리 데이터 로드
+        List<CategoryDTO> categories = productService.getCategory();
+        model.addAttribute("categories", categories);
 
-        return "inbound/inbound/request";
+        return "inbound/member/request";
     }
-    
-    // 입고요청시에 볼 상품 리스트
+
+
 
     // 입고 요청
-    @PostMapping("/member/inbound/request")
+    @PostMapping("/inbound/member/request")
     public ResponseEntity<InboundRequestDTO> inboundRequest(HttpSession session,
                                                             @Valid @RequestBody InboundRequestDTO inboundRequestDTO) {
+
+        // 로그인한 사용자의 memberId 가져오도록
+        Integer memberId = (Integer) session.getAttribute("loginMemberId");
+        inboundRequestDTO.setMemberId(memberId);
 
         InboundRequestDTO request = inboundService.createInbound(inboundRequestDTO);
 
         return ResponseEntity.ok(request);
     }
-
 
     // 입고 요청 목록 조회 (관리자용 - 브랜드, 상태 파라미터로 받아서 검색)
 

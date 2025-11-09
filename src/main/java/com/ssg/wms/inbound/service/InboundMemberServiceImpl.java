@@ -7,10 +7,12 @@ import com.ssg.wms.inbound.dto.InboundRequestDTO;
 import com.ssg.wms.inbound.dto.InboundRequestItemDTO;
 import com.ssg.wms.inbound.repository.InboundMemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Primary
 public class InboundMemberServiceImpl implements InboundMemberService {
 
     @Autowired
@@ -20,7 +22,7 @@ public class InboundMemberServiceImpl implements InboundMemberService {
     @Override
     public InboundRequestDTO createInbound(InboundRequestDTO inboundRequestDTO) {
         InboundVO inboundVO = new InboundVO();
-        inboundVO.setInboundId(inboundRequestDTO.getMemberId());
+//        inboundVO.setInboundId(inboundRequestDTO.getInboundId());
         inboundVO.setInboundStatus("request");
 
         inboundMemberMapper.insertInbound(inboundVO);

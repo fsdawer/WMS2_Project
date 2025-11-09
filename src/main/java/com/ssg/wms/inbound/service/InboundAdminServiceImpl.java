@@ -1,5 +1,10 @@
 package com.ssg.wms.inbound.service;
 
+import org.springframework.context.annotation.Primary;
+import org.springframework.stereotype.Service;
+
+@Service
+@Primary
 public class InboundAdminServiceImpl implements InboundAdminService {
 
     // 입고 요청 화면 이동
