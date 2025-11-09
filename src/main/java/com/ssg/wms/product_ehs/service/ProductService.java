@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ProductService {
 
-    List<ProductDTO> getProductsByPartner(int partnerId);
+    List<ProductDTO> getProductsByPartner(int partnerId, int categoryCd);
 
     List<CategoryDTO> getCategory();
 }

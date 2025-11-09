@@ -14,6 +14,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -22,6 +23,7 @@ import java.util.List;
 @Controller
 @RequiredArgsConstructor
 @Log4j2
+@RequestMapping("/inbound/member")
 public class InboundMemberController {
 
     private final InboundMemberService inboundService;
@@ -31,26 +33,35 @@ public class InboundMemberController {
 //    private final WarehouseService warehouseService
 
     // 입고 요청 화면 이동
-    @GetMapping("/inbound/member/request")
-    public String getInboundRequestForm(HttpSession session, Model model) {
+    @GetMapping("/request")
+    public String getInboundRequestForm(
+//            HttpSession session,
+                                        Model model) {
         // 로그인한 사용자의 user_id를 자동으로 가져오도록
-        Integer memberId = (Integer) session.getAttribute("loginMemberId");
-        String memberName = (String) session.getAttribute("loginMemberName");
+        Integer memberId = 1;
+//        Integer memberId = (Integer) session.getAttribute("loginMemberId");
+//        String memberName = (String) session.getAttribute("loginMemberName");
+        String memberName = "엄홍길";
         model.addAttribute("memberId", memberId);
         model.addAttribute("memberName", memberName);
 
         // 로그인한 사용자가 속한 거래처를 자동으로 가져오도록
-        int parterId = (Integer) session.getAttribute("loginMemberBrandId");
-        String partnerName = (String) session.getAttribute("loginMemberBrandId");
-        model.addAttribute("parterId", parterId);
+        int partnerId = 1;
+//        int partnerId = (Integer) session.getAttribute("loginMemberBrandId");
+//        String partnerName = (String) session.getAttribute("loginMemberBrandId");
+        String partnerName = "아디다스";
+        model.addAttribute("partnerId", partnerId);
         model.addAttribute("partnerName", partnerName);
 
-        // 입고요청시에 볼 상품 리스트 데이터 로드
-        List<ProductDTO> products = productService.getProductsByPartner(parterId);
-        model.addAttribute("products", products);
         // 카테고리 데이터 로드
         List<CategoryDTO> categories = productService.getCategory();
         model.addAttribute("categories", categories);
+        log.info(categories);
+
+        // 입고요청시에 볼 상품 리스트 데이터 로드
+        List<ProductDTO> products = productService.getProductsByPartner(partnerId, categoryCd);
+        model.addAttribute("products", products);
+
 
         return "inbound/member/request";
     }

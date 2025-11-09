@@ -1,11 +1,13 @@
 package com.ssg.wms.inbound.domain;
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class InboundItemVO {
-    private int inboundItemId;
     private int inboundId;
-    private int productId;
-    private int amount;
+    private int inboundItemId;
+    private String productId;
+    private int quantity;
 }

@@ -15,7 +15,7 @@
             <id property="inboundItemId" column="item_id"/>
             <result property="productId" column="product_id"/>
             <result property="productName" column="product_name"/>
-            <result property="amount" column="amount"/>
+            <result property="quantity" column="quantity"/>
         </collection>
     </resultMap>
 
@@ -24,29 +24,32 @@
             useGeneratedKeys="true" keyProperty="inboundId">
 
         INSERT INTO inbound (
-        warehouse_id,
-        staff_id,
-        member_id,
-        inbound_status,
-        inbound_reject_reason,
-        inbound_requested_at,
-        inbound_updated_at,
-        inbound_at
+<!--        warehouse_id,-->
+<!--        staff_id,-->
+        member_id
+<!--        ,-->
+<!--        inbound_status,-->
+<!--        inbound_reject_reason,-->
+<!--        inbound_requested_at,-->
+<!--        inbound_updated_at,-->
+<!--        inbound_at-->
         )
         VALUES (
-        #{warehouseId},
-        #{staffId},
-        #{memberId},
-        #{inboundStatus},
-        #{inboundRejectReason},
-        #{inboundRequestedAt},
-        #{inboundUpdatedAt},
-        #{inboundAt})
+<!--        #{warehouseId},-->
+<!--        #{staffId},-->
+        #{memberId}
+<!--        ,-->
+<!--        #{inboundStatus},-->
+<!--        #{inboundRejectReason},-->
+<!--        #{inboundRequestedAt},-->
+<!--        #{inboundUpdatedAt},-->
+<!--        #{inboundAt})-->
+        )
     </insert>
 
     <insert id="insertInboundItem">
-        INSERT INTO inbound_item (inbound_id, product_id, amount)
-        VALUES (#{inboundId}, #{productId}, #{amount})
+        INSERT INTO inbound_item (inbound_id, product_id, quantity)
+        VALUES (#{inboundId}, #{productId}, #{quantity})
     </insert>
 
 
@@ -59,7 +62,7 @@
         i.inbound_id, i.warehouse_id, w.warehouse_name,
         i.member_id, m.member_name,
         i.inbound_status,
-        ii.inbound_item_id, ii.product_id, p.product_name, ii.amount
+        ii.inbound_item_id, ii.product_id, p.product_name, ii.quantity
         FROM inbound i
         JOIN warehouse w ON i.warehouse_id = w.warehouse_id
         JOIN member m ON i.member_id = m.member_id

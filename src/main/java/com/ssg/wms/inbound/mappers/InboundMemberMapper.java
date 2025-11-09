@@ -11,7 +11,7 @@ public interface InboundMemberMapper {
     // 입고 요청 화면 이동
 
     // 입고 요청
-    void insertInbound(InboundVO inboundVO);
+    int insertInbound(InboundVO inboundVO);
 
     void insertInboundItem(InboundItemVO item);
 

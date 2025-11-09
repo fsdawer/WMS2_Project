@@ -33,8 +33,8 @@ public class InboundDTO {
 class InboundItemDTO {
     private int inboundItemId;
     private int inboundId;
-    private int productId;
+    private String productId;
     private String productName;
-    private int amount;
+    private int quantity;
 }
 

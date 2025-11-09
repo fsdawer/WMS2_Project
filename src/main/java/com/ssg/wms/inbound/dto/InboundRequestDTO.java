@@ -20,8 +20,4 @@ public class InboundRequestDTO {
 
     private List<InboundRequestItemDTO> inboundRequestItems; // 1:N 입고 품목
 
-//    public List<InboundRequestItemDTO> getInboundRequestItems() {
-//        return this.inboundRequestItems;
-//    }
-
 }

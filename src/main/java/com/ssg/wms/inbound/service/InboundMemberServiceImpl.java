@@ -21,9 +21,11 @@ public class InboundMemberServiceImpl implements InboundMemberService {
     @Transactional
     @Override
     public InboundRequestDTO createInbound(InboundRequestDTO inboundRequestDTO) {
-        InboundVO inboundVO = new InboundVO();
+        InboundVO inboundVO = InboundVO.builder()
+                .inboundStatus("request")
+                .build();
 //        inboundVO.setInboundId(inboundRequestDTO.getInboundId());
-        inboundVO.setInboundStatus("request");
+//        inboundVO.setInboundStatus("request");
 
         inboundMemberMapper.insertInbound(inboundVO);
         int inboundId = inboundVO.getInboundId();
@@ -32,11 +34,12 @@ public class InboundMemberServiceImpl implements InboundMemberService {
                 !inboundRequestDTO.getInboundRequestItems().isEmpty()) {
 
             for (InboundRequestItemDTO inboundItemDTO : inboundRequestDTO.getInboundRequestItems()) {
-                InboundItemVO inboundItemVO = new InboundItemVO();
+                InboundItemVO inboundItemVO = InboundItemVO.builder()
+                        .inboundId(inboundId)
+                        .productId(inboundItemDTO.getProductId())
+                        .quantity(inboundItemDTO.getQuantity())
+                        .build();
 
-                inboundItemVO.setInboundId(inboundId);
-                inboundItemVO.setProductId(inboundItemDTO.getProductId());
-                inboundItemVO.setAmount(inboundItemDTO.getAmount());
                 inboundMemberMapper.insertInboundItem(inboundItemVO);
             }
         }

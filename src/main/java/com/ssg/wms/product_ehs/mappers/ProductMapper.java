@@ -6,6 +6,6 @@ import com.ssg.wms.product_ehs.dto.ProductDTO;
 import java.util.List;
 
 public interface ProductMapper {
-    List<ProductDTO> selectProductsByPartner(int partnerId);
+    List<ProductDTO> selectProductsByPartner(int partnerId, int categoryCd);
     List<CategoryDTO> selectCategory();
 }
