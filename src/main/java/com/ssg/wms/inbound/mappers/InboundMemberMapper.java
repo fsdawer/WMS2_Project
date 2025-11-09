@@ -1,9 +1,11 @@
-package com.ssg.wms.inbound.repository;
+package com.ssg.wms.inbound.mappers;
 
 import com.ssg.wms.inbound.domain.InboundItemVO;
 import com.ssg.wms.inbound.domain.InboundVO;
 import com.ssg.wms.inbound.dto.InboundDTO;
+import org.apache.ibatis.annotations.Mapper;
 
+@Mapper
 public interface InboundMemberMapper {
 
     // 입고 요청 화면 이동

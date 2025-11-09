@@ -1,4 +1,4 @@
-package com.ssg.wms.product_ehs.repository;
+package com.ssg.wms.product_ehs.mappers;
 
 import com.ssg.wms.product_ehs.dto.CategoryDTO;
 import com.ssg.wms.product_ehs.dto.ProductDTO;

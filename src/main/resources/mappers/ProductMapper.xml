@@ -1,4 +1,4 @@
-<mapper namespace="com.ssg.wms.product.mapper.ProductMapper">
+<mapper namespace="com.ssg.wms.product.mappers.ProductMapper">
 
     <select id="selectProductsByPartner" resultType="com.ssg.wms.product.dto.ProductDTO">
         SELECT product_id, product_name

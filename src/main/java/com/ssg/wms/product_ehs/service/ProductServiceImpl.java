@@ -2,7 +2,7 @@ package com.ssg.wms.product_ehs.service;
 
 import com.ssg.wms.product_ehs.dto.CategoryDTO;
 import com.ssg.wms.product_ehs.dto.ProductDTO;
-import com.ssg.wms.product_ehs.repository.ProductMapper;
+import com.ssg.wms.product_ehs.mappers.ProductMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

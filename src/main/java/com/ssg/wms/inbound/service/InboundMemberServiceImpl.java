@@ -5,7 +5,7 @@ import com.ssg.wms.inbound.domain.InboundVO;
 import com.ssg.wms.inbound.dto.InboundDTO;
 import com.ssg.wms.inbound.dto.InboundRequestDTO;
 import com.ssg.wms.inbound.dto.InboundRequestItemDTO;
-import com.ssg.wms.inbound.repository.InboundMemberMapper;
+import com.ssg.wms.inbound.mappers.InboundMemberMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;

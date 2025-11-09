@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ssg.wms.inbound.mappers.InboundAdminMapper">
+
+<!--    <sql id="search">-->
+<!--        <if test="(types != null and keyword != null)">-->
+<!--            <foreach collection="types" item="type" open=" and ( " separator="OR" close=")">-->
+<!--                <choose>-->
+<!--                    <when test='type.equals("T")'>-->
+<!--                        title like concat('%',#{keyword},'%')-->
+<!--                    </when>-->
+<!--                    <when test='type.equals("C")'>-->
+<!--                        content like concat('%',#{keyword},'%')-->
+<!--                    </when>-->
+<!--                    <when test='type.equals("W")'>-->
+<!--                        writer like concat('%',#{keyword},'%')-->
+<!--                    </when>-->
+<!--                </choose>-->
+<!--            </foreach>-->
+<!--        </if>-->
+<!--    </sql>-->
+
+<!--    <select id="getListforMember" resultType="DTO">-->
+<!--        select * from-->
+<!--        inbound-->
+<!--        where inbound_id > 0-->
+<!--        <include refid="search"/>-->
+<!--        order by bno desc-->
+<!--        limit #{skip}, #{amount}-->
+<!--    </select>-->
+
+
+
+
+
+
+
+</mapper>
+
+
+
