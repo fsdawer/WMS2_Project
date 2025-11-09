@@ -368,8 +368,11 @@
         window.growthChart.render();
     }
 
+    // [수정 후] (값이 없으면 0으로 처리)
     function formatCurrency(amount) {
-        return new Intl.NumberFormat('ko-KR', {style: 'currency', currency: 'KRW'}).format(amount);
+        // amount가 null이나 undefined면 0으로 대체
+        let safeAmount = amount || 0;
+        return new Intl.NumberFormat('ko-KR', { style: 'currency', currency: 'KRW' }).format(safeAmount);
     }
 </script>
 </body>
