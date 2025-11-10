@@ -1,7 +1,8 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <% String contextPath = request.getContextPath(); %>
-<%@ include file="../../includes/admin/admin-header.jsp" %>
+<%@ include file="../../admin/admin-header.jsp" %>
+
 
 
 <div class="container mt-4">
@@ -141,4 +142,4 @@
 
 
 
-<%@ include file="../../includes/admin/admin-footer.jsp" %>
+<%@ include file="../../admin/admin-footer.jsp" %>

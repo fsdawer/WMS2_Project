@@ -1,7 +1,7 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <% String contextPath = request.getContextPath(); %>
-<%@ include file="../../includes/member/member-header.jsp" %>
+<%@ include file="../../member/member-header.jsp" %>
 
 <div class="container mt-4">
     <h4 class="fw-bold mb-3">입고 요청 목록</h4>
@@ -136,4 +136,4 @@
     }
 </script>
 
-<%@ include file="../../includes/member/member-footer.jsp" %>
+<%@ include file="../../member/member-footer.jsp" %>

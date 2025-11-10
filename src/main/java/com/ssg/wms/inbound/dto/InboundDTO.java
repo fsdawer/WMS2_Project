@@ -18,6 +18,7 @@ public class InboundDTO {
     private String warehouseName;
     private Long memberId;
     private Long partnerId;
+    private String partnerName;
     private String memberName;
     private int staffId;
     private String staffName;

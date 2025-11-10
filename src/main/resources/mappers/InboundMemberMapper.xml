@@ -10,6 +10,8 @@
         <result property="warehouseName" column="warehouse_name"/>
         <result property="memberId" column="member_id"/>
         <result property="memberName" column="member_name"/>
+        <result property="partnerName" column="partner_name"/>
+        <result property="inboundRequestedAt" column="inbound_requested_at"/>
         <result property="inboundStatus" column="inbound_status"/>
         <collection property="inboundItems" ofType="com.ssg.wms.inbound.dto.InboundItemDTO">
             <id property="inboundItemId" column="inbound_item_id"/>
@@ -62,16 +64,31 @@
     <!-- 입고 요청 단건 조회 -->
     <select id="selectInboundWithItems" resultMap="InboundWithItemsResultMap" parameterType="int">
         SELECT
-        i.inbound_id, i.warehouse_id, w.name,
-        i.member_id, m.member_name, pt.partner_name
+        i.inbound_id,
+        i.warehouse_id,
+        w.name AS warehouse_name,
+        i.member_id,
+        m.member_name,
+        i.staff_id,
+        st.staff_name,
+        pt.partner_name,
         i.inbound_status,
-        ii.inbound_item_id, ii.product_id, p.product_name, ii.quantity
+        ii.inbound_item_id,
+        ii.product_id,
+        p.product_name,
+        c.category_name,
+        ii.quantity,
+        i.inbound_requested_at,
+        i.inbound_at,
+        i.inbound_reject_reason
         FROM inbound i
         LEFT JOIN warehouse w ON i.warehouse_id = w.warehouse_id
         JOIN member m ON i.member_id = m.member_id
         JOIN partner pt ON m.partner_id = pt.partner_id
         LEFT JOIN inbound_item ii ON i.inbound_id = ii.inbound_id
         LEFT JOIN product p ON ii.product_id = p.product_id
+        LEFT JOIN category c ON p.category_id = c.category_id  -- 카테고리 조인 추가
+        LEFT JOIN staff st ON i.staff_id = st.staff_id
         WHERE i.inbound_id = #{inboundId}
     </select>
 

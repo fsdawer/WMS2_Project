@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 
-<!-- ✅ 입고 상세 모달 -->
+<!-- 입고 상세 모달 -->
 <div class="modal fade" id="inboundModal" tabindex="-1" aria-labelledby="inboundModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg"> <!-- 상품이 많을 수 있으므로 modal-lg -->
         <div class="modal-content">
@@ -10,7 +10,7 @@
             </div>
 
             <div class="modal-body">
-                <!-- ✅ 입고 기본 정보 -->
+                <!-- 입고 기본 정보 -->
                 <div class="row mb-3">
                     <div class="col-md-6">
                         <label class="form-label">입고 번호</label>
@@ -44,7 +44,7 @@
                     </div>
                 </div>
 
-                <!-- ✅ 상품 리스트 -->
+                <!-- 상품 리스트 -->
                 <h6 class="fw-bold mt-4 mb-2">입고 상품 내역</h6>
                 <table class="table table-sm table-bordered">
                     <thead class="table-light">
