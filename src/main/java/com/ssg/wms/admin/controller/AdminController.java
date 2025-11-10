@@ -2,10 +2,11 @@ package com.ssg.wms.admin.controller;
 
 import com.ssg.wms.admin.domain.Member;
 import com.ssg.wms.admin.dto.MemberCriteria;
-import com.ssg.wms.admin.dto.PageDTO;
+import com.ssg.wms.admin.dto.MemberPageDTO;
 import com.ssg.wms.admin.dto.StaffDTO;
 import com.ssg.wms.admin.service.AdminService;
 import com.ssg.wms.common.AccountStatus;
+import com.ssg.wms.common.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
@@ -42,6 +43,7 @@ public class AdminController {
                                  Model model) {
         // 세션에 저장
         session.setAttribute("loginId", id);
+        session.setAttribute("role", Role.ADMIN);
 
         // 모델에 담아서 뷰로 전달
         model.addAttribute("loginId", id);
@@ -72,7 +74,7 @@ public class AdminController {
         List<Member> members = adminService.getMembersByCriteria(criteria);
         int total = adminService.getMemberTotalCount(criteria);
 
-        PageDTO pageDTO = new PageDTO(criteria.getPageNum(),
+        MemberPageDTO pageDTO = new MemberPageDTO(criteria.getPageNum(),
                 criteria.getAmount(), total);
 
         model.addAttribute("members", members);

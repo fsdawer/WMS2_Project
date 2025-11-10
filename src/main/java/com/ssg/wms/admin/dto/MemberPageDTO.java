@@ -5,7 +5,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public class PageDTO {
+public class MemberPageDTO {
 
   private int startPage; //시작
   private int endPage; //화면에서 마지막 번호
@@ -16,7 +16,7 @@ public class PageDTO {
   private int pageNum;
   private int amount;
 
-  public PageDTO(int pageNum, int amount, int total) {
+  public MemberPageDTO(int pageNum, int amount, int total) {
 
     this.pageNum = pageNum;
     this.amount = amount;

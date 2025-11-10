@@ -295,7 +295,7 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="../announcements" class="menu-link">
                                 <div data-i18n="Account">공지사항</div>
                             </a>
                         </li>
