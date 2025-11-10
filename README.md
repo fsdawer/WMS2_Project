@@ -70,7 +70,10 @@ git commit -m "docs: API 명세서 업데이트"
 ```bash
 git checkout develop
 git pull origin develop
-git checkout -b dev/KHG(개인 브랜치)
+git checkout dev/KHG(개인 브랜치)
+--- 또는 ---
+git fetch origin
+git merge origin develop
 ```
 
 ### 2️⃣ 작업 & 커밋
