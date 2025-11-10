@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ include file="header.jsp" %>
+<%@ include file="member-header.jsp" %>
     <%-- 여기에 내용 입력 --%>
     <%-- <h4 class="fw-bold p-4">Blank Page</h4> --%>
-<%@ include file="footer.jsp" %>
+<%@ include file="member-footer.jsp" %>
