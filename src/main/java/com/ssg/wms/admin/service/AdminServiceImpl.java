@@ -17,12 +17,7 @@ public class AdminServiceImpl implements AdminService {
     private final AdminMapper adminMapper;
 
     @Override
-    public void updateStaff(StaffDTO staffDTO) {
-        adminMapper.updateStaff(staffDTO);
-    }
-
-    @Override
-    public Staff getStaffDetails(long staffId) {
+    public StaffDTO getStaffDetails(long staffId) {
         return adminMapper.getStaffDetails(staffId);
     }
 

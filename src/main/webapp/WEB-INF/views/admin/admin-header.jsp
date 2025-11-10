@@ -150,7 +150,7 @@
                 </li>
 
                 <li class="menu-item">
-                    <a href="index.html" class="menu-link">
+                    <a href="/admin/members" class="menu-link">
                         <i class="menu-icon tf-icons bx bx-layout"></i>
                         <div data-i18n="Layouts">고객 승인</div>
                     </a>
@@ -358,7 +358,7 @@
                                     <div class="dropdown-divider"></div>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="#">
+                                    <a class="dropdown-item" href="/admin/mypage">
                                         <i class="bx bx-user me-2"></i>
                                         <span class="align-middle">My Page</span>
                                     </a>

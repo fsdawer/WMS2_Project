@@ -16,17 +16,9 @@
         <result property="updatedAt" column="updated_at"/>
     </resultMap>
 
-    <!-- 직원 정보 수정 -->
-    <update id="updateStaff">
-        UPDATE staff
-        SET staff_phone = #{staffPhone},
-            staff_email = #{staffEmail}
-        WHERE staff_id = #{staffId}
-    </update>
-
     <!-- 직원 정보 조회 -->
-    <select id="getStaffDetails" resultType="Staff">
-        SELECT staff_login_id, staff_name, staff_phone, staff_email, role, created_at, updated_at
+    <select id="getStaffDetails" resultType="StaffDTO">
+        SELECT staff_login_id, staff_name, staff_phone, staff_email, role, status, created_at, updated_at
         FROM staff
         WHERE staff_id = #{staffId}
     </select>

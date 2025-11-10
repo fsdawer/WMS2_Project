@@ -10,8 +10,7 @@ import java.util.List;
 
 @Mapper
 public interface AdminMapper {
-    void updateStaff(StaffDTO staffDTO);
-    Staff getStaffDetails(long staffId);
+    StaffDTO getStaffDetails(long staffId);
     long findStaffIdByStaffLoginId(String staffLoginId);
     List<Member> getMembersByCriteria(MemberSearchCriteriaDTO criteria);
     Member getMemberDetails(long memberId);

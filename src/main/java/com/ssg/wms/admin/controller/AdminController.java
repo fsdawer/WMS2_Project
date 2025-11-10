@@ -1,12 +1,13 @@
 package com.ssg.wms.admin.controller;
 
 import com.ssg.wms.admin.domain.Member;
-import com.ssg.wms.admin.domain.Staff;
 import com.ssg.wms.admin.dto.MemberSearchCriteriaDTO;
+import com.ssg.wms.admin.dto.StaffDTO;
 import com.ssg.wms.admin.service.AdminService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
@@ -45,7 +46,7 @@ public class AdminController {
         return "admin/connect";
     }
 
-
+    @Transactional
     @GetMapping("/mypage")
     public String getUserInfo(HttpSession session, Model model) {
         // 마이페이지 조회
@@ -56,9 +57,9 @@ public class AdminController {
 
         // 로그인 ID -> 고유 ID 구하고 직원 정보 얻음
         long staffId = adminService.findStaffIdByStaffLoginId(id);
-        Staff staff = adminService.getStaffDetails(staffId);
+        StaffDTO staffDTO = adminService.getStaffDetails(staffId);
 
-        model.addAttribute("staff", staff);
+        model.addAttribute("staff", staffDTO);
         return "admin/mypage";
     }
 

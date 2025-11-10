@@ -8,8 +8,7 @@ import com.ssg.wms.admin.dto.StaffDTO;
 import java.util.List;
 
 public interface AdminService {
-    void updateStaff(StaffDTO staffDTO);
-    Staff getStaffDetails(long staffId);
+    StaffDTO getStaffDetails(long staffId);
     List<Member> getMembersByCriteria(MemberSearchCriteriaDTO criteria);
     Member getMemberDetails(long memberId);
     long findStaffIdByStaffLoginId(String staffLoginId);

@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -15,5 +17,5 @@ public class MemberSearchCriteriaDTO {
     private Role role;
     private AccountStatus status;
     private String keyword;
-
+    private LocalDateTime createdAt;
 }

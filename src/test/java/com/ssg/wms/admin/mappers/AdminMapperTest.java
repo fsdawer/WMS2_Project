@@ -29,21 +29,6 @@ public class AdminMapperTest {
     }
 
     @Test
-    void testUpdateStaff() {
-
-        StaffDTO dto = StaffDTO.builder()
-                .staffPhone("010-1234-5678")
-                .staffEmail("test@test.com")
-                .build();
-
-        adminMapper.updateStaff(dto);
-
-        Staff updated = adminMapper.getStaffDetails(1L);
-
-        System.out.println("수정 결과: " + updated);
-    }
-
-    @Test
     void testGetMembersByCriteria() {
         MemberSearchCriteriaDTO criteria = new MemberSearchCriteriaDTO();
         criteria.setKeyword("홍"); // LIKE 검색용
