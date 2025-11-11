@@ -1,70 +1,15 @@
 /**
  * warehouse.js
- * 공통 JS 파일: 창고 등록/목록/상세 페이지 지도 및 이름 중복 확인
+ * 공통 JS 파일: 창고 등록/목록/상세 페이지 지도 기능만 포함 (중복 함수 제거됨)
  */
 
-// ---------------------- 1. 창고 이름 중복 확인 ----------------------
-function checkDuplication() {
-    const name = $('#name').val().trim();
-    const resultElement = $('#nameCheckResult');
-    const isNameChecked = $('#isNameChecked');
+// ---------------------- 1. (제거됨) 창고 이름 중복 확인 ----------------------
+// -> 이 기능은 register.jsp의 인라인 <script>로 이동되었습니다.
 
-    if (name === "") {
-        resultElement.text("이름을 입력해주세요.").css('color', 'orange');
-        isNameChecked.val("false");
-        return;
-    }
+// ---------------------- 2. (제거됨) 등록폼 유효성 검사 ----------------------
+// -> 이 기능은 register.jsp의 인라인 <script>로 이동되었습니다.
 
-    // CONTEXT_PATH 변수는 JSP 파일에서 <script> 태그 등으로 정의되어 있어야 합니다.
-    const url = CONTEXT_PATH + '/api/warehouses/check/name';
-
-    $.ajax({
-        url: url,
-        type: 'GET',
-        data: { name: name },
-        dataType: 'json',
-        success: function(isDuplicated) {
-            if (isDuplicated === true) {
-
-                resultElement.text("이미 사용 중인 이름입니다.").css('color', 'red');
-                isNameChecked.val("false");
-                alert("중복된 이름입니다. 다른 이름을 사용해주세요."); // 팝업 추가
-            } else {
-
-                resultElement.text("사용 가능한 이름입니다.").css('color', 'green');
-                isNameChecked.val("true");
-                alert("사용 가능한 이름입니다."); // 팝업 추가
-            }
-        },
-        error: function(xhr) {
-            console.error("중복 확인 AJAX 호출 실패. Status:", xhr.status, "URL:", url);
-            resultElement.text("서버 또는 네트워크 오류 발생").css('color', 'red').css('font-weight', 'bold');
-            isNameChecked.val("false");
-            alert("중복 확인에 실패했습니다.");
-        }
-    });
-}
-
-// ---------------------- 2. 등록폼 유효성 검사 ----------------------
-function validateForm() {
-    const nameChecked = document.getElementById("isNameChecked").value === "true";
-    if (!nameChecked) {
-        alert("창고 이름 중복 확인을 해주세요.");
-        return false;
-    }
-
-    // 추가: 위도/경도 입력 확인
-    const lat = document.getElementById("latitude").value;
-    const lng = document.getElementById("longitude").value;
-    if (!lat || !lng) {
-        alert("창고 주소를 입력하고 [주소로 위치 확인] 버튼을 눌러 위치를 설정해주세요.");
-        return false;
-    }
-
-    return true;
-}
-
-// ---------------------- 3. 주소 검색 및 좌표 표시 (개선됨) ----------------------
+// ---------------------- 3. 주소 검색 및 좌표 표시 ----------------------
 function searchAddress() {
     const address = document.getElementById("address").value.trim();
     // JSP 파일의 <span id="coordResult"> 요소에 메시지를 표시합니다.

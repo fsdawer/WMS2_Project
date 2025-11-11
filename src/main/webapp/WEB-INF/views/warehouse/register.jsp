@@ -105,7 +105,7 @@
     <h2>구역 정보 등록</h2>
     <div id="sectionsContainer">
         <div class="section-container" id="section-1">
-            <div class="section-header">
+            <%--@declare id="sections_0_purpose"--%><%--@declare id="sections_0_area"--%><%--@declare id="sections_0_type"--%><%--@declare id="sections_0_name"--%><div class="section-header">
                 <h4>새 구역 1</h4>
                 <button type="button" onclick="removeSection(1)" style="background-color: darkred; color: white; padding: 5px 10px;">삭제</button>
             </div>
@@ -123,11 +123,8 @@
             </select>
 
             <label for="sections_0_purpose">목적</label>
-            <select name="sections[0].sectionPurpose" required>
-                <option value="">선택</option>
-                <option value="보관">보관</option>
-                <option value="검수">검수</option>
-            </select>
+            <input type="text" name="sections[0].sectionPurpose">
+
             <label for="sections_0_area">면적</label>
             <input type="text" name="sections[0].allocatedArea" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
 
@@ -234,8 +231,6 @@
             return false;
         }
 
-        // 기본 구역이 이미 존재하므로, 최소 구역 확인은 이제 필요 없습니다.
-        // 하지만 혹시 첫 구역이 삭제될 경우를 대비해, 최소 1개는 확인합니다.
         const sectionCount = document.getElementById("sectionsContainer").children.length;
         if (sectionCount === 0) {
             alert("최소한 하나 이상의 구역 정보를 등록해야 합니다.");
@@ -272,11 +267,8 @@
         </select>
 
         <label for="sections_${index}_purpose">목적</label>
-        <select name="sections[${index}].sectionPurpose" required>
-            <option value="">선택</option>
-            <option value="보관">보관</option>
-            <option value="검수">검수</option>
-        </select>
+        <input type="text" name="sections[${index}].sectionPurpose">
+
         <label for="sections_${index}_area">면적</label>
         <input type="text" name="sections[${index}].allocatedArea" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
 
