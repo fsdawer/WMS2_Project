@@ -3,7 +3,9 @@ package com.ssg.wms.warehouse.dto;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+
+import java.util.Date;
+
 
 /// 창고 목록 항목 DTO 입니다.!!
 
@@ -30,12 +32,14 @@ public class WarehouseListDTO {
     /// 경도 (지도 마커 표시용)
     private Double longitude;
 
-    //  XML Mapper의 컬럼과 매핑됩니다.
+
     /// 운영 현황 (0:점검 중, 1:운영 중)
     private Byte warehouseStatus;
 
-    //  XML Mapper의 컬럼과 매핑됩니다.
+
     /// 최종 수정 일자
-    private LocalDateTime latestUpdateDate;
+    private Date latestUpdateDate;
+
+    private Date registrationDate;
 
 }

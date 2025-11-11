@@ -1,10 +1,10 @@
 package com.ssg.wms.warehouse.mapper;
 
-import com.ssg.wms.warehouse.dto.SectionDTO;
-import com.ssg.wms.warehouse.dto.WarehouseSaveDTO;
-import com.ssg.wms.warehouse.dto.WarehouseUpdateDTO;
+import com.ssg.wms.warehouse.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+
+import java.util.List;
 
 @Mapper
 public interface WarehouseAdminMapper {
@@ -25,6 +25,8 @@ public interface WarehouseAdminMapper {
     int updateWarehouseStatus(@Param("id") Long id, @Param("newStatus") Byte newStatus);
 
     int insertSection(SectionDTO section);
+
+    List<WarehouseListDTO> selectWarehouses(WarehouseSearchDTO searchForm);
 
     // 6. 창고 상세 조회 (관리 기능 수행 전 데이터 확인을 위해 필요할 수 있음)
     // *Member Mapper와 메소드 명칭이 다를 경우 사용*

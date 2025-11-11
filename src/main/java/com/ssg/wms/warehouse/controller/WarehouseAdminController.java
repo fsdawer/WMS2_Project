@@ -20,7 +20,7 @@ public class WarehouseAdminController {
 
     private final WarehouseAdminService warehouseAdminService;
     private final WarehouseMemberService memberService;
-    private static final Long MOCK_ADMIN_ID = 1L; // 💡 다시 MOCK ID 사용
+    private static final Long MOCK_ADMIN_ID = 1L; //  다시 MOCK ID 사용
 
     @Autowired
     public WarehouseAdminController(
@@ -35,7 +35,8 @@ public class WarehouseAdminController {
 
     @GetMapping({"", "/location"})
     public String adminListIndex(@ModelAttribute("searchForm") WarehouseSearchDTO searchForm, Model model) {
-        List<WarehouseListDTO> list = memberService.findWarehouses(searchForm);
+
+        List<WarehouseListDTO> list = warehouseAdminService.findWarehouses(searchForm);
         model.addAttribute("warehouseList", list);
         model.addAttribute("userRole", "ADMIN");
         return "warehouse/list";
@@ -58,11 +59,14 @@ public class WarehouseAdminController {
 
         try {
             saveDTO.setAdminId(MOCK_ADMIN_ID); // MOCK ID 사용
+
+            // 💡 창고 이름 중복 확인은 Service 계층 saveWarehouse 내부에서 처리됩니다. (saveWarehouse 로직 확인 완료)
             Long newWarehouseId = warehouseAdminService.saveWarehouse(saveDTO);
 
             redirectAttributes.addFlashAttribute("message", newWarehouseId + "번 창고 등록이 완료되었습니다.");
             return "redirect:/admin/warehouses";
         } catch (IllegalArgumentException e) {
+            // Service에서 던진 이름 중복 예외 처리
             bindingResult.rejectValue("name", "name.duplicate", e.getMessage());
             return "warehouse/register";
         } catch (Exception e) {
@@ -138,6 +142,11 @@ public class WarehouseAdminController {
 
     // ------------------- 2. API Controller (AJAX 전용) -------------------
 
+    /**
+     *  창고 이름 중복 확인 API
+     * 클라이언트(JavaScript)에서 이 경로로 요청을 보내 중복 여부를 Boolean 값으로 받습니다.
+     * GET /admin/warehouses/api/check/name?name=테스트창고
+     */
     @GetMapping("/api/check/name")
     @ResponseBody
     public Boolean checkNameDuplication(@RequestParam String name) {

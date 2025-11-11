@@ -1,8 +1,6 @@
 package com.ssg.wms.warehouse.service;
 
-import com.ssg.wms.warehouse.dto.SectionDTO;
-import com.ssg.wms.warehouse.dto.WarehouseSaveDTO;
-import com.ssg.wms.warehouse.dto.WarehouseUpdateDTO;
+import com.ssg.wms.warehouse.dto.*;
 import com.ssg.wms.warehouse.mapper.WarehouseAdminMapper;
 import com.ssg.wms.warehouse.util.KakaoApiUtil;
 import lombok.extern.log4j.Log4j2;
@@ -10,20 +8,23 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Log4j2
 @Service
 @Transactional
-// 인터페이스를 WarehouseAdminService로 변경합니다.
+
 public class WarehouseAdminServiceImpl implements WarehouseAdminService {
 
-    private final WarehouseAdminMapper adminManagerMapper;
+    // 🚨 [수정] Mapper 변수명을 일관성을 위해 warehouseAdminMapper로 변경
+    private final WarehouseAdminMapper warehouseAdminMapper;
     private final KakaoApiUtil kakaoApiUtil;
 
     @Autowired
     public WarehouseAdminServiceImpl(
-            WarehouseAdminMapper adminManagerMapper,
+            WarehouseAdminMapper warehouseAdminMapper, // 🚨 [수정] 매개변수명 변경
             KakaoApiUtil kakaoApiUtil) {
-        this.adminManagerMapper = adminManagerMapper;
+        this.warehouseAdminMapper = warehouseAdminMapper;
         this.kakaoApiUtil = kakaoApiUtil;
 //        log.info("WarehouseAdminServiceImpl 초기화 완료.");
     }
@@ -32,7 +33,8 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
     @Override
     public boolean checkNameDuplication(String name) {
         log.debug("창고 이름 중복 확인 시작 (Admin): {}", name);
-        return adminManagerMapper.countWarehouseName(name) > 0;
+        // 🚨 [로직 사용] Mapper의 countWarehouseName 호출
+        return warehouseAdminMapper.countWarehouseName(name) > 0;
     }
 
     /** 창고 등록 구현 (Admin) (핵심 로직: Geocoding 연동 및 구역 등록) */
@@ -63,14 +65,14 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
         saveDTO.setLatitude(coords[1]);
 
         // 4. 창고 (WAREHOUSE) DB에 저장
-        int insertedRows = adminManagerMapper.insertWarehouse(saveDTO);
+        // 이 시점에서 saveDTO.getWarehouseId()에 PK가 채워집니다.
+        int insertedRows = warehouseAdminMapper.insertWarehouse(saveDTO);
 
         if (insertedRows != 1) {
             log.error("WAREHOUSE INSERT 실패 (Admin) (영향 받은 행 수: {}). 트랜잭션 롤백.", insertedRows);
             throw new RuntimeException("창고 등록에 실패했습니다.");
         }
 
-        // ** PK (warehouseId)는 insertWarehouse 실행 후 DTO에 채워져 있습니다. **
         Long warehouseId = saveDTO.getWarehouseId();
 
         // 5. 구역 (SECTION) 정보 등록 추가
@@ -78,11 +80,12 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
             log.info("구역 정보 등록 시작 (Admin). 구역 수: {}", saveDTO.getSections().size());
 
             for (SectionDTO section : saveDTO.getSections()) {
-                // FK(warehouse_id) 설정
-                section.setSectionId(warehouseId);
+
+
+                section.setWarehouseId(warehouseId);
 
                 // Mapper를 호출하여 SECTION 테이블에 삽입
-                int sectionInsertedRows = adminManagerMapper.insertSection(section);
+                int sectionInsertedRows = warehouseAdminMapper.insertSection(section);
 
                 if (sectionInsertedRows != 1) {
                     log.error("SECTION INSERT 실패 (Admin). 트랜잭션 롤백.");
@@ -103,8 +106,8 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
         updateDTO.setWarehouseId(id);
 
         log.debug("창고 수정 시작 (Admin). ID: {}", id);
-
-        int updatedRows = adminManagerMapper.updateWarehouse(updateDTO);
+        // 🚨 [수정] Mapper 호출
+        int updatedRows = warehouseAdminMapper.updateWarehouse(updateDTO);
 
         if (updatedRows != 1) {
             log.warn("수정 실패 (Admin): 창고 ID({})가 존재하지 않거나 수정된 행이 없습니다.", id);
@@ -118,8 +121,8 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
     @Transactional
     public void deleteWarehouse(Long id) {
         log.debug("창고 삭제 시작 (Admin). ID: {}", id);
-
-        int deletedRows = adminManagerMapper.deleteWarehouse(id);
+        // 🚨 [수정] Mapper 호출
+        int deletedRows = warehouseAdminMapper.deleteWarehouse(id);
 
         if (deletedRows != 1) {
             log.warn("삭제 실패 (Admin): 창고 ID({})가 존재하지 않거나 삭제된 행이 없습니다.", id);
@@ -133,12 +136,19 @@ public class WarehouseAdminServiceImpl implements WarehouseAdminService {
     @Transactional
     public void updateWarehouseStatus(Long id, Byte newStatus) {
         log.debug("창고 상태 업데이트 시작 (Admin). ID: {}, New Status: {}", id, newStatus);
-        int updatedRows = adminManagerMapper.updateWarehouseStatus(id, newStatus);
+
+        // 현재는 Mapper에서 @Param이나 Map을 사용한다고 가정하고 호출합니다.
+        int updatedRows = warehouseAdminMapper.updateWarehouseStatus(id, newStatus);
 
         if (updatedRows != 1) {
             log.warn("상태 업데이트 실패 (Admin): 창고 ID({})가 존재하지 않습니다.", id);
             throw new IllegalArgumentException("상태를 변경하려는 창고를 찾을 수 없습니다.");
         }
         log.info("창고 상태 업데이트 성공 (Admin). ID: {}", id);
+    }
+
+    @Override
+    public List<WarehouseListDTO> findWarehouses(WarehouseSearchDTO searchForm) {
+        return warehouseAdminMapper.selectWarehouses(searchForm);
     }
 }

@@ -17,10 +17,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+// 🚨 [추가] HttpSession import
+import javax.servlet.http.HttpSession;
+
 import java.util.List;
 
 @Controller
-// 💡 기본 경로를 /member/warehouses로 설정
 @RequestMapping("/member/warehouses")
 public class WarehouseMemberController {
 
@@ -42,9 +44,31 @@ public class WarehouseMemberController {
 
     // 창고 위치 조회 (메인 페이지 역할) 및 목록 조회 화면 로드
     @GetMapping({"/location", ""})
-    public String getWarehouseListView(@ModelAttribute WarehouseSearchDTO searchForm, Model model, RedirectAttributes redirectAttributes) {
+    public String getWarehouseListView(
+            @ModelAttribute WarehouseSearchDTO searchForm,
+            Model model,
+            RedirectAttributes redirectAttributes,
+            HttpSession session) { //
 
-        model.addAttribute("userRole", "MEMBER");
+        // 세션에서 사용자 ID를 가져오는 로직
+        Long loggedInUserId = null;
+        Object userIdObj = session.getAttribute("userId"); // 세션 키가 "userId"라고 가정
+
+        if (userIdObj != null) {
+            try {
+                // 세션 값이 Long 타입임을 가정하고 캐스팅
+                loggedInUserId = (Long) userIdObj;
+            } catch (ClassCastException e) {
+                // 세션에 String으로 저장되었을 경우 (예외 처리 후 String으로 변환 시도)
+                try {
+                    loggedInUserId = Long.valueOf(userIdObj.toString());
+                } catch (NumberFormatException nfe) {
+                    System.err.println("세션 ID를 Long 타입으로 변환할 수 없습니다: " + userIdObj);
+                }
+            }
+        }
+
+
 
         try {
             List<WarehouseListDTO> list = memberService.findWarehouses(searchForm);
@@ -71,6 +95,7 @@ public class WarehouseMemberController {
         return "warehouse/list";
     }
 
+    
     // 창고 상세 화면 로드 (MEMBER는 조회만 가능)
     @GetMapping("/{whid}")
     public String getWarehouseDetailView(@PathVariable("whid") Long warehouseId, Model model, RedirectAttributes redirectAttributes) {
@@ -82,19 +107,13 @@ public class WarehouseMemberController {
         } catch (IllegalArgumentException e) {
             // 창고 ID를 찾지 못했을 때
             redirectAttributes.addFlashAttribute("error", "요청하신 창고 정보를 찾을 수 없습니다.");
-            // 💡 리다이렉트 경로를 /member/warehouses로 수정
+
             return "redirect:/member/warehouses";
         }
 
 
         return "warehouse/detail";
     }
-
-
-    // ----------------------------------------------------------------------
-    // 2. Data API Controller (REST API, @RestController로 분리 권장)
-    // ----------------------------------------------------------------------
-    // 이 메서드들을 /api/v1/member/warehouses 등으로 분리하여 사용하는 것을 권장합니다.
 
     // 창고 목록 데이터 조회 (JSON 제공)
     @GetMapping("/api/warehouses")

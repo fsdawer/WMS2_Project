@@ -1,7 +1,11 @@
 package com.ssg.wms.warehouse.service;
 
+import com.ssg.wms.warehouse.dto.WarehouseListDTO;
 import com.ssg.wms.warehouse.dto.WarehouseSaveDTO;
+import com.ssg.wms.warehouse.dto.WarehouseSearchDTO;
 import com.ssg.wms.warehouse.dto.WarehouseUpdateDTO;
+
+import java.util.List;
 
 public interface WarehouseAdminService {
 
@@ -19,4 +23,6 @@ public interface WarehouseAdminService {
 
     /** 창고 상태 업데이트 */
     void updateWarehouseStatus(Long id, Byte newStatus);
+
+    List<WarehouseListDTO> findWarehouses(WarehouseSearchDTO searchForm);
 }

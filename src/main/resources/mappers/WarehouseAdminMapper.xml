@@ -12,6 +12,7 @@
         <result property="longitude" column="longitude"/>
         <result property="warehouseStatus" column="warehouse_status"/>
         <result property="latestUpdateDate" column="latest_update_date"/>
+        <result property="registrationDate" column="registration_date"/>
     </resultMap>
 
     <resultMap id="warehouseDetailResultMap" type="com.ssg.wms.warehouse.dto.WarehouseDetailDTO">
@@ -43,7 +44,7 @@
             latest_update_date
         ) VALUES (
                      #{adminId},
-                     #{name},
+                     #{warehouseName},
                      #{warehouseType},
                      #{warehouseCapacity},
                      #{warehouseStatus},
@@ -74,7 +75,7 @@
     <update id="updateWarehouse" parameterType="com.ssg.wms.warehouse.dto.WarehouseUpdateDTO">
         UPDATE WAREHOUSE
         SET
-            name = #{name},
+            name = #{warehouseName},
             admin_id = #{adminId},
             warehouse_type = #{warehouseType},
             warehouse_capacity = #{warehouseCapacity},
@@ -112,12 +113,15 @@
         latitude,
         longitude,
         warehouse_status,
-        latest_update_date
-        FROM
-        WAREHOUSE
+        latest_update_date,
+        registration_date
+        FROM WAREHOUSE
         WHERE 1=1
-        <if test="name != null and name != ''">
-            AND name LIKE CONCAT('%', #{name}, '%')
+        <if test="warehouseName != null and warehouseName != ''">
+            AND name LIKE CONCAT('%', #{warehouseName}, '%')
+        </if>
+        <if test="warehouseAddress != null and warehouseAddress != ''">
+            AND address LIKE CONCAT('%', #{warehouseAddress}, '%')
         </if>
         <if test="warehouseType != null and warehouseType != ''">
             AND warehouse_type = #{warehouseType}
@@ -141,10 +145,8 @@
             w.longitude,
             w.registration_date,
             w.latest_update_date
-        FROM
-            WAREHOUSE w
-        WHERE
-            w.warehouse_id = #{id}
+        FROM WAREHOUSE w
+        WHERE w.warehouse_id = #{id}
     </select>
 
 </mapper>
