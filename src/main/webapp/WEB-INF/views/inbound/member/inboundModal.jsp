@@ -97,6 +97,9 @@
             </div>
 
             <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="updateInboundBtn">
+                    수정
+                </button>
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x-circle me-1"></i>닫기
                 </button>

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Controller
@@ -65,7 +66,7 @@ public class InboundMemberController {
 
     @GetMapping("/products/byCategory")
     @ResponseBody
-    public List<ProductDTO> getProductsByPartner(
+    public ResponseEntity<List<ProductDTO>> getProductsByPartner(
             @RequestParam Integer categoryCd,
             HttpSession session) {
 
@@ -73,7 +74,19 @@ public class InboundMemberController {
         Integer partnerId = 1; // 예제
         // 실제 구현: session.getAttribute("loginMemberBrandId");
 
-        return productService.getProductsByPartnerAndCategory(partnerId, categoryCd);
+        try {
+            List<ProductDTO> products = productService.getProductsByPartnerAndCategory(partnerId, categoryCd);
+
+            if (products == null || products.isEmpty()) {
+                return ResponseEntity.ok(Collections.emptyList());
+            }
+
+            return ResponseEntity.ok(products);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
     // 입고 요청
@@ -145,13 +158,21 @@ public class InboundMemberController {
     // 입고 요청 수정
     @PutMapping("/{inboundId}")
     public ResponseEntity<InboundDTO> editInboundRequest(
+            HttpSession session,
             @PathVariable int inboundId,
             @RequestBody InboundRequestDTO inboundRequestDTO) {
 
+        Long memberId = (Long) session.getAttribute("memberId");
+        if(memberId == null) {
+            memberId = 1L; // 테스트용
+        }
+        inboundRequestDTO.setMemberId(memberId);
         inboundRequestDTO.setInboundId(inboundId);
 
         // 서비스에서 수정 후 최신 데이터 반환
         InboundDTO updatedDto = inboundMemberService.updateInbound(inboundRequestDTO);
+
+        System.out.println("InboundRequestDTO: " + inboundRequestDTO);
 
         return ResponseEntity.ok(updatedDto);
     }

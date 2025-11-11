@@ -243,6 +243,8 @@
         }
 
         // 전역 함수로 노출
+        /*현재 스코프에 있는 openInboundModal 함수를 전역 객체 window의 openInboundModal 속성으로 등록.
+            이렇게 하면 어디서든 window.openInboundModal() 혹은 단순히 openInboundModal()로 호출 가능.*/
         window.openInboundModal = openInboundModal;
     });
 </script>

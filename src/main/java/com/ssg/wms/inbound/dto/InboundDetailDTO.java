@@ -17,6 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 public class InboundDetailDTO {
     private Long inboundId;
+    private Long warehouseId;
     private String warehouseName;
     private Integer partnerId;
     private String partnerName;
