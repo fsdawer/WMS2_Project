@@ -1,6 +1,7 @@
 package com.ssg.wms.inbound.controller;
 
 import com.ssg.wms.inbound.dto.InboundDTO;
+import com.ssg.wms.inbound.dto.InboundDetailDTO;
 import com.ssg.wms.inbound.dto.InboundListDTO;
 import com.ssg.wms.inbound.dto.InboundRequestDTO;
 import com.ssg.wms.product_ehs.dto.CategoryDTO;
@@ -111,17 +112,17 @@ public class InboundMemberController {
 
     // 입고 요청 단건 조회
     @GetMapping("/{inboundId}")
-    public ResponseEntity<InboundDTO> getInboundById(@PathVariable int inboundId,
-                                                     Model model,
-                                                     HttpSession session) {
-        InboundDTO inboundDTO = inboundMemberService.getInboundById(inboundId);
+    public ResponseEntity<InboundDetailDTO> getInboundById(@PathVariable int inboundId,
+                                                           Model model,
+                                                           HttpSession session) {
+        InboundDetailDTO inboundDetailDTO = inboundMemberService.getInboundById(inboundId);
 
         // 테스트용 하드코딩
-        if (inboundDTO.getPartnerId() == null) {
-            inboundDTO.setPartnerId(1L); // 원하는 partnerId 값
+        if (inboundDetailDTO.getPartnerId() == null) {
+            inboundDetailDTO.setPartnerId(1); // 원하는 partnerId 값
         }
 
-        if(inboundDTO == null) {
+        if(inboundDetailDTO == null) {
             return ResponseEntity.notFound().build();
         }
 
@@ -134,11 +135,11 @@ public class InboundMemberController {
         }
 
         // 거래처 권한 체크
-        if (inboundDTO.getPartnerId() == null || !inboundDTO.getPartnerId().equals(partnerId)) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        if (partnerId == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
 
-        return ResponseEntity.ok(inboundDTO);
+        return ResponseEntity.ok(inboundDetailDTO);
     }
 
     // 입고 요청 수정

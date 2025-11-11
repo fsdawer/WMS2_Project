@@ -55,123 +55,125 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+
     $(document).ready(function() {
         const inboundModalElement = document.getElementById('inboundModal');
         const inboundModal = new bootstrap.Modal(inboundModalElement);
 
-        // 상태 필터 변경 시 리스트 새로고침
-        $("#statusFilter").change(function() {
-            const status = $(this).val();
-            $.ajax({
-                url: "/inbound/member/list",
-                type: "get",
-                data: { status: status },
-                success: function(data) {
-                    const newBody = $(data).find("#inboundTableBody").html();
-                    $("#inboundTableBody").html(newBody);
-                },
-                error: function() {
-                    alert("리스트 조회 중 오류가 발생했습니다.");
-                }
-            });
-        });
+        // 전역 변수 선언
+        let categories = [];
+        let products = [];
 
-        // 테이블 행 클릭 시 상세 모달 띄우기
-        $(document).on('click', '#inboundTableBody tr', function() {
-            const inboundId = $(this).data('inbound-id');
-            console.log('선택한 inboundId:', inboundId);
-            if (inboundId) openInboundModal(inboundId);
-        });
-
-        // 날짜 포맷 함수
         function formatDate(dateInput) {
-            if(!dateInput) return '';
-            if(typeof dateInput === 'string') return dateInput.substring(0,16).replace('T',' ');
-            if(dateInput instanceof Date) return dateInput.toISOString().substring(0,16).replace('T',' ');
+            if (!dateInput) return '';
+            if (typeof dateInput === 'string') return dateInput.length >= 16 ? dateInput.substring(0,16).replace('T',' ') : dateInput;
+            if (dateInput instanceof Date) return dateInput.toISOString().substring(0,16).replace('T',' ');
             return String(dateInput);
         }
 
-        // 상품 행 추가
-        function addInboundItemRow(item) {
-            const template = document.getElementById('inboundItemTemplate');
-            if (!template) {
-                console.error('템플릿을 찾을 수 없습니다.');
-                return;
-            }
-
-            const clone = template.cloneNode(true);
-            clone.removeAttribute('id');
-            clone.style.display = '';
-
-            // INDEX 대체 (form submit 용)
-            const uniqueIndex = Date.now() + Math.floor(Math.random() * 1000);
-            clone.innerHTML = clone.innerHTML.replaceAll('INDEX', uniqueIndex);
-
-            document.getElementById('inboundItemsBody').appendChild(clone);
-
-            const productSelect = clone.querySelector('.productSelect');
-            const categorySelect = clone.querySelector('.categorySelect');
-            const quantityInput = clone.querySelector('.quantity');
-            const removeBtn = clone.querySelector('.removeItemBtn');
-
-            // DB 값 존재 시 매핑
-            if(item){
-                if(categorySelect && item.categoryCd != null){
-                    categorySelect.value = String(item.categoryCd);
-                }
-
-                if(productSelect && item.productId){
-                    productSelect.value = item.productId;
-
-                    // 상품 선택 후 카테고리 재설정
-                    const selectedOption = productSelect.selectedOptions[0];
-                    if(selectedOption && categorySelect){
-                        const cat = selectedOption.dataset.category;
-                        if(cat) categorySelect.value = String(cat);
-                    }
-                }
-
-                if(quantityInput){
-                    quantityInput.value = item.quantity || 1;
-                }
-            }
-
-
-            // 상품 변경 시 카테고리 자동 설정
-            if(productSelect && categorySelect){
-                productSelect.addEventListener('change', () => {
-                    const selected = productSelect.selectedOptions[0];
-                    if(selected){
-                        categorySelect.value = selected.dataset.category || '';
-                    }
-                });
-            }
-
-            // 삭제 버튼
-            if(removeBtn){
-                removeBtn.addEventListener('click', () => clone.remove());
-            }
-        }
-
-        // 상품 목록 렌더링
-        function renderInboundItems(items){
+        // 상품 렌더링 함수
+        function renderInboundItems(items, categories, products) {
             const tbody = document.getElementById('inboundItemsBody');
             tbody.innerHTML = '';
 
-            if(items && items.length > 0){
-                items.forEach(item => addInboundItemRow(item));
+            if (!items || items.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="4" class="text-center text-muted py-3">입고 상품이 없습니다.</td></tr>';
+                return;
             }
+
+            items.forEach((item, index) => {
+                // 카테고리 select
+                let categoryOptions = '';
+                categories.forEach(function(c) {
+                    const selected = c.categoryCd === item.categoryCd ? 'selected' : '';
+                    categoryOptions += '<option value="' + c.categoryCd + '" ' + selected + '>' + c.categoryName + '</option>';
+                });
+
+                // 초기에는 현재 상품만 표시 (DB에서 가져온 데이터)
+                const initialProductOption = '<option value="' + item.productId + '" data-category="' + item.categoryCd + '" selected>' + item.productName + '</option>';
+
+                const row = '<tr>' +
+                    '<td>' +
+                    '<select class="form-select categorySelect" data-original-category="' + item.categoryCd + '">' +
+                    categoryOptions +
+                    '</select>' +
+                    '</td>' +
+                    '<td>' +
+                    '<select class="form-select productSelect" data-original-product="' + item.productId + '">' +
+                    initialProductOption +
+                    '</select>' +
+                    '</td>' +
+                    '<td class="text-end">' +
+                    '<input type="number" class="form-control quantity" value="' + item.quantity + '" min="1"/>' +
+                    '</td>' +
+                    '<td>' +
+                    '<button type="button" class="btn btn-sm btn-danger removeItemBtn">삭제</button>' +
+                    '</td>' +
+                    '</tr>';
+
+                tbody.insertAdjacentHTML('beforeend', row);
+            });
         }
 
+
+        // 카테고리 변경 시 상품 목록 API 호출
+        $(document).on('change', '.categorySelect', function() {
+            const partnerId = $('#inboundModal').data('partnerId');
+            const selectedCategory = $(this).val();
+            const productSelect = $(this).closest('tr').find('.productSelect');
+
+            if (!selectedCategory) {
+                productSelect.html('<option value="">카테고리를 먼저 선택하세요</option>').prop('disabled', true);
+                return;
+            }
+
+            // 로딩 표시
+            productSelect.html('<option>로딩 중...</option>').prop('disabled', true);
+
+            // API 호출하여 해당 카테고리+거래처의 상품 목록 가져오기
+            axios.get('<%=contextPath%>/products/by-category-and-partner', {
+                params: {
+                    categoryCd: selectedCategory,
+                    partnerId: partnerId
+                }
+            })
+                .then(function(response) {
+                    const products = response.data;
+                    productSelect.empty().prop('disabled', false);
+
+                    if (!products || products.length === 0) {
+                        productSelect.append('<option value="">상품이 없습니다</option>');
+                        return;
+                    }
+
+                    products.forEach(function(p) {
+                        productSelect.append('<option value="' + p.productId + '" data-category="' + p.categoryCd + '">' + p.productName + '</option>');
+                    });
+                })
+                .catch(function(err) {
+                    console.error('상품 목록 조회 오류:', err);
+                    productSelect.html('<option value="">조회 실패</option>').prop('disabled', false);
+                    alert('상품 목록을 불러오는데 실패했습니다.');
+                });
+        });
+
         // 모달 열기
-        function openInboundModal(inboundId){
+        function openInboundModal(inboundId) {
             axios.get('<%=contextPath%>/inbound/member/' + inboundId)
-                    .then(response => {
+                .then(function(response) {
                     const data = response.data;
-                    if(!data){
+
+                    if (!data) {
                         alert('데이터를 불러올 수 없습니다.');
                         return;
                     }
+
+                    // 전역 변수 초기화
+                    categories = data.categories || [];
+                    products = data.products || [];
+
+                    // partnerId를 저장
+                    $('#inboundModal').data('partnerId', data.partnerId);
 
                     // 기본 정보
                     document.getElementById('inboundId').value = data.inboundId || '';
@@ -185,31 +187,73 @@
 
                     // 반려 사유
                     const rejectSection = document.getElementById('rejectReasonSection');
-                    if(data.inboundStatus === 'rejected' && data.inboundRejectReason){
+                    if (data.inboundStatus === 'rejected' && data.inboundRejectReason) {
                         document.getElementById('inboundRejectReason').value = data.inboundRejectReason;
                         rejectSection.style.display = 'block';
                     } else {
                         rejectSection.style.display = 'none';
                     }
 
-                    // 상품 목록 렌더링
-                    renderInboundItems(data.inboundItems);
+                    // 상품 렌더링
+                    renderInboundItems(data.inboundItems, categories, products);
 
                     inboundModal.show();
                 })
-                .catch(err => {
+                .catch(function(err) {
                     console.error('입고 상세 조회 오류:', err);
                     alert('입고 상세 조회 중 오류가 발생했습니다.');
                 });
         }
 
-        // 상품 추가 버튼
-        document.getElementById('addInboundItemBtn').addEventListener('click', () => addInboundItemRow(null));
+        // 테이블 행 클릭
+        $(document).on('click', '#inboundTableBody tr', function() {
+            const inboundId = $(this).find('td:first').text().trim();
+            if (inboundId) openInboundModal(inboundId);
+        });
+
+        // 상품 select 변경 시 category 자동 설정
+        $(document).on('change', '.productSelect', function() {
+            const selected = this.selectedOptions[0];
+            if (selected) {
+                $(this).closest('tr').find('.categorySelect').val(selected.dataset.category);
+            }
+        });
+
+        // 상품 삭제
+        $(document).on('click', '.removeItemBtn', function() {
+            $(this).closest('tr').remove();
+        });
+
+        // 상품 추가
+        $('#addInboundItemBtn').click(function() {
+            const tbody = document.getElementById('inboundItemsBody');
+            let categoryOptions = '<option value="">카테고리 선택</option>';
+            categories.forEach(function(c) {
+                categoryOptions += '<option value="' + c.categoryCd + '">' + c.categoryName + '</option>';
+            });
+
+            const row = '<tr>' +
+                '<td>' +
+                '<select class="form-select categorySelect">' +
+                categoryOptions +
+                '</select>' +
+                '</td>' +
+                '<td>' +
+                '<select class="form-select productSelect" disabled>' +
+                '<option value="">카테고리를 먼저 선택하세요</option>' +
+                '</select>' +
+                '</td>' +
+                '<td class="text-end"><input type="number" class="form-control quantity" value="1" min="1"/></td>' +
+                '<td><button type="button" class="btn btn-sm btn-danger removeItemBtn">삭제</button></td>' +
+                '</tr>';
+            tbody.insertAdjacentHTML('beforeend', row);
+        });
 
         // 전역 노출
         window.openInboundModal = openInboundModal;
     });
 </script>
+
 
 
 

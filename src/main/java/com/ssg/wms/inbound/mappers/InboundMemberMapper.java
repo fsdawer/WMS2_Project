@@ -2,10 +2,7 @@ package com.ssg.wms.inbound.mappers;
 
 import com.ssg.wms.inbound.domain.InboundItemVO;
 import com.ssg.wms.inbound.domain.InboundVO;
-import com.ssg.wms.inbound.dto.InboundDTO;
-import com.ssg.wms.inbound.dto.InboundListDTO;
-import com.ssg.wms.inbound.dto.InboundRequestDTO;
-import com.ssg.wms.inbound.dto.InboundRequestItemDTO;
+import com.ssg.wms.inbound.dto.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -23,6 +20,9 @@ public interface InboundMemberMapper {
 
     // 입고 요청 단건 조회
     InboundDTO selectInboundWithItems(int inboundId);
+
+    // 입고 수정시 출력해줄 입고 상세DTO
+    InboundDetailDTO selectInboundWithItemsDetail(int inboundId);
 
     // 입고 요청 수정
     // 입고 기본 정보 수정
