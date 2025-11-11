@@ -5,29 +5,41 @@
 <head>
   <title>창고 목록 및 위치 조회</title>
 
-  <!-- 카카오 지도 SDK -->
   <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=8284a9e56dbc80e2ab8f41c23c1bbb0a&libraries=services"></script>
 
   <style>
+    /* 지도 컨테이너 크기 필수 지정 */
     #map { width: 100%; height: 500px; margin-bottom: 20px; }
     table { width: 100%; border-collapse: collapse; }
     th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
     th { background-color: #f4f4f4; }
     a { text-decoration: none; color: blue; }
+
+    /* 마커 위 이름 표시 스타일 */
+    .marker-label {
+      background-color: #fff;
+      border: 1px solid #000;
+      padding: 2px 5px;
+      font-size: 12px;
+      font-weight: bold;
+      color: #000;
+      text-align: center;
+      border-radius: 3px;
+      box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
+      white-space: nowrap;
+      cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+    }
   </style>
 </head>
 <body>
 <h1>창고 목록 및 위치 조회</h1>
 
-<!-- 새로운 창고 등록 버튼 -->
 <button onclick="location.href='${pageContext.request.contextPath}/admin/warehouses/register'" style="margin-bottom: 15px;">
   새로운 창고 등록
 </button>
 
-<!-- 지도 영역 -->
 <div id="map"></div>
 
-<!-- 창고 테이블 -->
 <table>
   <thead>
   <tr>
@@ -67,52 +79,82 @@
 
 <script type="text/javascript">
   // 서버에서 전달한 warehouseList JSON 데이터를 JS 객체로 변환
-  var warehouseData = ${jsWarehouseData};
+  var jsonString = '${jsWarehouseData}';
+  var warehouseData = [];
+  try {
+    if (jsonString && jsonString.trim().length > 0) {
+      // JSON 파싱 시 'jsWarehouseData' 변수에 유효한 JSON 문자열이 담겨야 합니다.
+      warehouseData = JSON.parse(jsonString.replace(/&quot;/g, '"')); // 혹시 모를 HTML 엔티티 치환 처리
+    }
+  } catch(e) {
+    console.error("창고 데이터 JSON 파싱 오류:", e);
+  }
 
-  // 지도 초기화
-  var container = document.getElementById('map');
-  var options = {
-    center: new kakao.maps.LatLng(37.5665, 126.9780), // 초기 중심 좌표 (서울)
-    level: 5
-  };
-  var map = new kakao.maps.Map(container, options);
-
-  // 지도 범위를 자동으로 조정할 LatLngBounds 객체 생성
-  var bounds = new kakao.maps.LatLngBounds();
-
-  // 마커와 InfoWindow 생성
-  warehouseData.forEach(function(wh) {
-    if (!wh.latitude || !wh.longitude) {
-      console.warn("Invalid coordinates for warehouse:", wh.name);
+  // 카카오 지도 로드 및 초기화
+  kakao.maps.load(function() {
+    var container = document.getElementById('map');
+    if (!container) {
+      console.error("지도 컨테이너(map)를 찾을 수 없습니다.");
       return;
     }
 
-    var position = new kakao.maps.LatLng(wh.latitude, wh.longitude);
+    var defaultCenter = new kakao.maps.LatLng(37.5665, 126.9780); // 서울 시청
+    var options = { center: defaultCenter, level: 7 };
+    var map = new kakao.maps.Map(container, options);
 
-    // 마커 생성
-    var marker = new kakao.maps.Marker({
-      position: position,
-      map: map,
-      title: wh.name
-    });
+    var bounds = new kakao.maps.LatLngBounds();
+    var hasValidCoords = false;
 
-    // InfoWindow 생성
-    var infowindow = new kakao.maps.InfoWindow({
-      content: `<div style="padding:5px; font-weight:bold;">${wh.name}<br/>${wh.address}</div>`
-    });
+    if (Array.isArray(warehouseData)) {
+      warehouseData.forEach(function(wh) {
+        var lat = Number(wh.latitude);
+        var lng = Number(wh.longitude);
 
-    // 마커 클릭 시 InfoWindow 열기
-    kakao.maps.event.addListener(marker, 'click', function() {
-      infowindow.open(map, marker);
-    });
+        // 유효한 좌표가 아니면 건너뛰기
+        if (isNaN(lat) || isNaN(lng) || lat === 0 || lng === 0) return;
 
-    // bounds에 좌표 추가
-    bounds.extend(position);
+        hasValidCoords = true;
+        var position = new kakao.maps.LatLng(lat, lng);
+
+        // 1. 마커 생성
+        var marker = new kakao.maps.Marker({ position: position, map: map });
+
+        // 2. CustomOverlay로 창고 이름 표시 (마커 위에 바로 보이게 함)
+        // yAnchor: 1 은 마커의 바로 위에 오버레이가 위치하도록 설정합니다.
+        var overlay = new kakao.maps.CustomOverlay({
+          position: position,
+          content: `<div class="marker-label">${wh.name}</div>`,
+          map: map,
+          yAnchor: 1
+        });
+
+        // 3. InfoWindow 생성
+        var infowindow = new kakao.maps.InfoWindow({
+          content: `<div style="padding:5px; font-weight:bold;">${wh.name}<br/>${wh.address}</div>`
+        });
+
+        // 4. 마커 및 오버레이 클릭 시 InfoWindow 열기
+        kakao.maps.event.addListener(marker, 'click', function() {
+          infowindow.open(map, marker);
+        });
+        // 오버레이 클릭 시 마커를 기준으로 InfoWindow 열기
+        kakao.maps.event.addListener(overlay, 'click', function() {
+          infowindow.open(map, marker);
+        });
+
+        // 지도 범위에 좌표 추가
+        bounds.extend(position);
+      });
+    }
+
+    // 창고가 하나라도 유효한 좌표를 가지고 있으면 해당 범위로 지도 이동
+    if (hasValidCoords) {
+      map.setBounds(bounds);
+    } else {
+      // 유효한 좌표가 없으면 기본 위치로 설정
+      map.setCenter(defaultCenter);
+    }
   });
-
-  // 모든 마커가 보이도록 지도 범위 조정
-  map.setBounds(bounds);
 </script>
-
 </body>
 </html>

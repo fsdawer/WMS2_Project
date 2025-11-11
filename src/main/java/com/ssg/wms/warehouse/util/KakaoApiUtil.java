@@ -8,7 +8,6 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
-// ⭐ 추가된 import
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -33,7 +32,7 @@ public class KakaoApiUtil {
 
         String encodedAddress; // 변수를 try 블록 밖에서 선언
 
-        // ⭐ 1. 주소 인코딩에 try-catch 블록 추가하여 UnsupportedEncodingException 처리 ⭐
+
         try {
             // StandardCharsets.UTF_8 객체의 toString() 메서드를 사용하여 String 인코딩 타입을 전달
             encodedAddress = URLEncoder.encode(address, StandardCharsets.UTF_8.toString());

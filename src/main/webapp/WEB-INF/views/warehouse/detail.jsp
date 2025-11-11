@@ -142,8 +142,7 @@
   </div>
 </div>
 
-<button onclick="location.href='${pageContext.request.contextPath}/warehouses'" style="margin-top: 10px;">목록으로</button>
-
+<button onclick="location.href='${pageContext.request.contextPath}/admin/warehouses'" style="margin-top: 10px;">목록으로</button>
 <script src="${pageContext.request.contextPath}/static/warehouse/warehouse.js"></script>
 <script>
   // 마커 표시를 위한 데이터

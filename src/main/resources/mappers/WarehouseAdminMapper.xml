@@ -44,8 +44,7 @@
             latest_update_date
         ) VALUES (
                      #{adminId},
-                     #{warehouseName},
-                     #{warehouseType},
+                     #{name}, #{warehouseType},
                      #{warehouseCapacity},
                      #{warehouseStatus},
                      #{address},
@@ -56,27 +55,42 @@
                  )
     </insert>
 
-    <insert id="insertSection" parameterType="com.ssg.wms.warehouse.dto.SectionDTO">
-        INSERT INTO section (
-            warehouse_id,
-            section_name,
-            section_type,
-            section_purpose,
-            allocated_area
+    <insert id="insertLocation" parameterType="com.ssg.wms.warehouse.dto.LocationDTO">
+        INSERT INTO LOCATION (
+            section_id,
+            location_code,
+            floor_num,
+            location_type_code,
+            max_volume
         ) VALUES (
-                     #{warehouseId},
-                     #{sectionName},
-                     #{sectionType},
-                     #{sectionPurpose},
-                     #{allocatedArea}
+                     #{sectionId},
+                     #{locationCode},
+                     #{floorNum},
+                     #{locationTypeCode},
+                     #{maxVolume}
                  )
+    </insert>
+
+    <insert id="insertSection" parameterType="com.ssg.wms.warehouse.dto.SectionDTO"
+            useGeneratedKeys="true" keyProperty="sectionId"> INSERT INTO SECTION (
+        warehouse_id,
+        section_name,
+        section_type,
+        section_purpose,
+        allocated_area
+    ) VALUES (
+                 #{warehouseId},
+                 #{sectionName},
+                 #{sectionType},
+                 #{sectionPurpose},
+                 #{allocatedArea}
+             )
     </insert>
 
     <update id="updateWarehouse" parameterType="com.ssg.wms.warehouse.dto.WarehouseUpdateDTO">
         UPDATE WAREHOUSE
         SET
-            name = #{warehouseName},
-            admin_id = #{adminId},
+            name = #{name}, admin_id = #{adminId},
             warehouse_type = #{warehouseType},
             warehouse_capacity = #{warehouseCapacity},
             warehouse_status = #{warehouseStatus},

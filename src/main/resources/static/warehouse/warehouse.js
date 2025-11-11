@@ -1,16 +1,9 @@
 /**
- * 공통: 이름 중복 확인
- * @설명 서버에서 { "duplicate": true/false } 형태의 JSON을 기대합니다.
- */
-/**
  * warehouse.js
- * (전체 파일이 아닌, checkDuplication 함수와 연결된 로직만 표시됩니다. 기존 함수들은 이 파일에 존재한다고 가정합니다.)
+ * 공통 JS 파일: 창고 등록/목록/상세 페이지 지도 및 이름 중복 확인
  */
 
-// ... (다른 함수 및 변수 선언) ...
-
-// ---------------------- 1. 창고 이름 중복 확인 (오류 수정) ----------------------
-
+// ---------------------- 1. 창고 이름 중복 확인 ----------------------
 function checkDuplication() {
     const name = $('#name').val().trim();
     const resultElement = $('#nameCheckResult');
@@ -22,7 +15,7 @@ function checkDuplication() {
         return;
     }
 
-    // ⭐⭐ 수정 사항: Context Path를 사용하여 URL 구성 (404 오류 해결) ⭐⭐
+    // CONTEXT_PATH 변수는 JSP 파일에서 <script> 태그 등으로 정의되어 있어야 합니다.
     const url = CONTEXT_PATH + '/api/warehouses/check/name';
 
     $.ajax({
@@ -30,53 +23,68 @@ function checkDuplication() {
         type: 'GET',
         data: { name: name },
         dataType: 'json',
-
         success: function(isDuplicated) {
             if (isDuplicated === true) {
+
                 resultElement.text("이미 사용 중인 이름입니다.").css('color', 'red');
                 isNameChecked.val("false");
+                alert("중복된 이름입니다. 다른 이름을 사용해주세요."); // 팝업 추가
             } else {
+
                 resultElement.text("사용 가능한 이름입니다.").css('color', 'green');
                 isNameChecked.val("true");
+                alert("사용 가능한 이름입니다."); // 팝업 추가
             }
         },
         error: function(xhr) {
-            // 404/JSON 오류 시 "서버 또는 네트워크 오류 발생" 메시지 표시
             console.error("중복 확인 AJAX 호출 실패. Status:", xhr.status, "URL:", url);
             resultElement.text("서버 또는 네트워크 오류 발생").css('color', 'red').css('font-weight', 'bold');
             isNameChecked.val("false");
+            alert("중복 확인에 실패했습니다.");
         }
     });
 }
 
-
-/**
- * 공통: 등록폼 유효성 검사
- */
+// ---------------------- 2. 등록폼 유효성 검사 ----------------------
 function validateForm() {
     const nameChecked = document.getElementById("isNameChecked").value === "true";
-
-    // Spring Validation은 서버에서 처리되지만, 클라이언트에서는 이름 중복 확인 선행 검사
     if (!nameChecked) {
         alert("창고 이름 중복 확인을 해주세요.");
         return false;
     }
 
-    // 주소, 종류, 용량 등의 유효성 검사는 서버의 @Valid 어노테이션이 담당하며,
-    // 실패 시 서버에서 에러 메시지와 함께 페이지를 반환함.
+    // 추가: 위도/경도 입력 확인
+    const lat = document.getElementById("latitude").value;
+    const lng = document.getElementById("longitude").value;
+    if (!lat || !lng) {
+        alert("창고 주소를 입력하고 [주소로 위치 확인] 버튼을 눌러 위치를 설정해주세요.");
+        return false;
+    }
 
     return true;
 }
 
-/**
- * 등록 페이지: 주소 검색 및 좌표 표시
- */
+// ---------------------- 3. 주소 검색 및 좌표 표시 (개선됨) ----------------------
 function searchAddress() {
     const address = document.getElementById("address").value.trim();
+    // JSP 파일의 <span id="coordResult"> 요소에 메시지를 표시합니다.
+    const resultElement = document.getElementById("coordResult");
+
     if (!address) {
         alert("주소를 입력해주세요.");
+        if (resultElement) {
+            resultElement.textContent = "주소를 입력해 주세요.";
+            resultElement.style.color = 'orange';
+        }
         return;
     }
+
+    // 검색 시작 시 사용자에게 피드백 제공
+    if (resultElement) {
+        resultElement.textContent = "위치 확인 중...";
+        resultElement.style.color = 'gray';
+    }
+
 
     const geocoder = new kakao.maps.services.Geocoder();
     geocoder.addressSearch(address, function(result, status) {
@@ -84,11 +92,10 @@ function searchAddress() {
             const lat = parseFloat(result[0].y);
             const lng = parseFloat(result[0].x);
 
-            // 위도/경도 필드에 값 저장 (서버로 전송될 값)
+            // 폼 필드에 위도/경도 값 저장
             document.getElementById("latitude").value = lat;
             document.getElementById("longitude").value = lng;
 
-            // 지도 표시 로직
             const mapContainer = document.getElementById("map");
             const position = new kakao.maps.LatLng(lat, lng);
             const mapOption = { center: position, level: 3 };
@@ -96,62 +103,93 @@ function searchAddress() {
 
             const marker = new kakao.maps.Marker({ position: position });
             marker.setMap(map);
+
+            // 사용자에게 성공적으로 좌표를 찾았음을 알림 (사용자 편의성 향상)
+            if (resultElement) {
+                resultElement.textContent = `위치 확인 완료: Lat ${lat.toFixed(4)}, Lng ${lng.toFixed(4)}`;
+                resultElement.style.color = 'green';
+            }
         } else {
             alert("주소를 찾을 수 없습니다. 다시 입력해주세요.");
+            // 사용자에게 실패를 알림 (사용자 편의성 향상)
+            if (resultElement) {
+                resultElement.textContent = "주소를 찾을 수 없습니다.";
+                resultElement.style.color = 'red';
+            }
         }
     });
 }
 
-/**
- * 등록 페이지: 지도 초기화
- */
+// ---------------------- 4. 등록 페이지 지도 초기화 ----------------------
 function initMapForRegister(mapId) {
     if (typeof kakao === "undefined" || typeof kakao.maps === "undefined") {
-        console.error("Kakao 지도 API가 로드되지 않았습니다.");
-        return;
+        console.error("Kakao 지도 API가 로드되지 않았습니다."); return;
     }
 
     const mapContainer = document.getElementById(mapId);
+    // 기본 위치를 서울 시청으로 설정
     const defaultPosition = new kakao.maps.LatLng(37.566826, 126.9786567);
-    const mapOption = { center: defaultPosition, level: 7 };
+    const mapOption = { center: defaultPosition, level: 7 }; // 넓은 범위의 레벨
     const map = new kakao.maps.Map(mapContainer, mapOption);
 }
 
-/**
- * 목록 페이지: 지도 표시
- */
+// ---------------------- 5. 목록 페이지 지도 표시 ----------------------
 function initMapForList(mapId, data) {
-    if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined' || data.length === 0) {
+    if (typeof kakao === 'undefined' || typeof kakao.maps === 'undefined' || !Array.isArray(data) || data.length === 0) {
+        // 지도를 표시할 수 없는 경우 처리
+        console.warn("창고 목록 데이터가 없거나 Kakao API가 로드되지 않아 지도를 표시할 수 없습니다.");
         return;
     }
 
     const mapContainer = document.getElementById(mapId);
-    const first = data[0] || {};
-    const lat = Number(first.latitude) || 37.566826;
-    const lng = Number(first.longitude) || 126.9786567;
+
+    // 데이터가 있을 경우 첫 번째 창고를 기준으로 중심 설정 (아니면 서울)
+    const first = data.find(w => w.latitude && w.longitude);
+    const lat = Number(first?.latitude) || 37.566826;
+    const lng = Number(first?.longitude) || 126.9786567;
     const center = new kakao.maps.LatLng(lat, lng);
 
     const map = new kakao.maps.Map(mapContainer, { center, level: 8 });
+    const bounds = new kakao.maps.LatLngBounds();
 
     data.forEach(w => {
         if (w.latitude && w.longitude) {
             const position = new kakao.maps.LatLng(Number(w.latitude), Number(w.longitude));
-            const marker = new kakao.maps.Marker({ position, map, title: w.name });
-            const infowindow = new kakao.maps.InfoWindow({
-                content: `<div style="padding:5px;">${w.name}</div>`
+
+            // 마커 생성
+            const marker = new kakao.maps.Marker({ position, map });
+
+            // 항상 보이는 말풍선(CustomOverlay) 생성
+            const overlay = new kakao.maps.CustomOverlay({
+                map: map,
+                position: position,
+                content: `<div style="
+                    background: #fff;
+                    border: 1px solid #000;
+                    padding: 3px 6px;
+                    font-weight: bold;
+                    font-size: 12px;
+                    border-radius: 4px;
+                    box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
+                    white-space: nowrap;
+                    text-align: center;
+                ">${w.name}</div>`,
+                yAnchor: 1 // 마커 바로 위
             });
-            infowindow.open(map, marker);
+
+            bounds.extend(position);
         }
     });
+
+    // 모든 마커가 보이도록 지도 범위 재설정
+    if (data.length > 0) {
+        map.setBounds(bounds);
+    }
 }
 
-/**
- * 상세 페이지: 지도 표시
- */
+// ---------------------- 6. 상세 페이지 지도 표시 ----------------------
 function initMapForDetail(mapId, warehouse) {
-    if (!warehouse || !warehouse.latitude || !warehouse.longitude) {
-        return;
-    }
+    if (!warehouse || !warehouse.latitude || !warehouse.longitude) return;
 
     const lat = Number(warehouse.latitude);
     const lng = Number(warehouse.longitude);
@@ -164,8 +202,21 @@ function initMapForDetail(mapId, warehouse) {
     const marker = new kakao.maps.Marker({ position });
     marker.setMap(map);
 
-    const infowindow = new kakao.maps.InfoWindow({
-        content: `<div style="padding:5px;">${warehouse.name}</div>`
+    // 창고 이름 표시
+    const overlay = new kakao.maps.CustomOverlay({
+        map: map,
+        position: position,
+        content: `<div style="
+            background: #fff;
+            border: 1px solid #000;
+            padding: 3px 6px;
+            font-weight: bold;
+            font-size: 12px;
+            border-radius: 4px;
+            box-shadow: 2px 2px 2px rgba(0,0,0,0.3);
+            white-space: nowrap;
+            text-align: center;
+        ">${warehouse.name}</div>`,
+        yAnchor: 1
     });
-    infowindow.open(map, marker);
 }
