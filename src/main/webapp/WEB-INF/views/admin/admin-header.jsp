@@ -271,7 +271,7 @@
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="#" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/inquiries" class="menu-link">
                                 <div data-i18n="QnA">문의사항</div>
                             </a>
                         </li>

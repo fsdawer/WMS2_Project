@@ -132,7 +132,7 @@
     async function loadReplies() {
         try {
             const response = await axios.get('/api/inquiries/' + inquiryId + '/replies');
-            const replies = response.data;
+            const replies = Array.isArray(response.data) ? response.data : [];
 
             document.getElementById('replyCount').textContent = replies.length;
 
@@ -143,15 +143,21 @@
                 return;
             }
 
-            replyList.innerHTML = replies.map(reply => `
-                    <div class="reply-item" onclick="showReplyDetail(${reply.replyId})">
-                        <div class="reply-item-header">
-                            <span class="reply-writer">${reply.writer}</span>
-                            <span class="reply-date">${reply.createdAt}</span>
-                        </div>
-                        <div class="reply-content-preview">${escapeHtml(reply.content)}</div>
+            replyList.innerHTML = replies.map(reply => {
+                const safeContent = escapeHtml(reply.content || '');
+                const safeWriter = escapeHtml(reply.writer || '');
+                const safeDate = reply.createdAt || '';
+
+                return `
+                <div class="reply-item" onclick="showReplyDetail(${reply.replyId})">
+                    <div class="reply-item-header">
+                        <span class="reply-writer">${safeWriter}</span>
+                        <span class="reply-date">${safeDate}</span>
                     </div>
-                `).join('');
+                    <div class="reply-content-preview">${safeContent}</div>
+                </div>
+            `;
+            }).join('');
         } catch (error) {
             console.error('답글 목록 조회 실패:', error);
             alert('답글 목록을 불러오는데 실패했습니다.');
@@ -160,27 +166,34 @@
 
     // 답글 상세보기
     async function showReplyDetail(replyId) {
+        console.log("replyId: ", replyId);
         try {
-            const response = await axios.get('/api/inquiries/' + inquiryId + '/reply/' + 'replyId');
+            const response = await axios.get('/api/inquiries/' + inquiryId + '/reply/' + replyId);
             currentReply = response.data;
 
-            document.getElementById('detailWriter').textContent = currentReply.writer;
-            document.getElementById('detailCreatedAt').textContent = currentReply.createdAt;
-            document.getElementById('detailUpdatedAt').textContent = currentReply.updatedAt;
-            document.getElementById('detailContent').textContent = currentReply.content;
+            const writerEl = document.getElementById('detailWriter');
+            const createdEl = document.getElementById('detailCreatedAt');
+            const updatedEl = document.getElementById('detailUpdatedAt');
+            const contentEl = document.getElementById('detailContent');
 
-            // 작성자인 경우 수정/삭제 버튼 표시
+            if (writerEl) writerEl.textContent = currentReply.writer || '';
+            if (createdEl) createdEl.textContent = currentReply.createdAt || '';
+            if (updatedEl) updatedEl.textContent = currentReply.updatedAt || '';
+            if (contentEl) contentEl.textContent = currentReply.content || '';
+
             const footer = document.getElementById('detailModalFooter');
-            if (loginId === currentReply.writer) {
-                footer.innerHTML = `
-                        <button class="btn btn-secondary" onclick="closeDetailModal()">닫기</button>
-                        <button class="btn btn-primary" onclick="openEditModal()">수정</button>
-                        <button class="btn btn-danger" onclick="deleteReply()">삭제</button>
-                    `;
-            } else {
-                footer.innerHTML = `
-                        <button class="btn btn-secondary" onclick="closeDetailModal()">닫기</button>
-                    `;
+            if (footer) {
+                if (loginId === currentReply.writer) {
+                    footer.innerHTML = `
+                    <button class="btn btn-secondary" onclick="closeDetailModal()">닫기</button>
+                    <button class="btn btn-primary" onclick="openEditModal()">수정</button>
+                    <button class="btn btn-danger" onclick="deleteReply()">삭제</button>
+                `;
+                } else {
+                    footer.innerHTML = `
+                    <button class="btn btn-secondary" onclick="closeDetailModal()">닫기</button>
+                `;
+                }
             }
 
             document.getElementById('detailModal').classList.add('show');

@@ -1,4 +1,4 @@
-package com.ssg.wms.admin.domain;
+package com.ssg.wms.member.domain;
 
 import com.ssg.wms.common.AccountStatus;
 import com.ssg.wms.common.Role;
