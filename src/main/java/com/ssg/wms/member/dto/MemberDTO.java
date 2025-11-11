@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class MemberDTO {
     private Long memberId;
     private String memberLoginId;
+    private String memberPw;
     private String memberName;
     private String memberPhone;
     private String memberEmail;
@@ -24,5 +25,4 @@ public class MemberDTO {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private String businessNumber;
-
 }

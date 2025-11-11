@@ -14,11 +14,11 @@
             content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Register</title>
+    <title>Register | RACL WMS</title>
 
     <meta name="description" content=""/>
 
-    <link rel="icon" type="image/x-xicon"
+    <link rel="icon" type="image/x-icon"
           href="${pageContext.request.contextPath}/resources/assets/img/favicon/favicon.ico"/>
 
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -75,4 +75,171 @@
                                 id="path-4"
                         ></path>
                         <path
-                                d="M20.6,7.13333333 L25.6,13.8 C26.2627417,14.6836556 26.0836556,15.9372583 25.2,16.6 C24.8538077,16.8596443 24.4327404,17 24,17 L14,17 C12.8954305,17 12,16.1045695 12,15 C12,14.5672596 12.1403557,14.1461923 12.4,13.
+                                d="M20.6,7.13333333 L25.6,13.8 C26.2627417,14.6836556 26.0836556,15.9372583 25.2,16.6 C24.8538077,16.8596443 24.4327404,17 24,17 L14,17 C12.8954305,17 12,16.1045695 12,15 C12,14.5672596 12.1403557,14.1461923 12.4,13.8 L17.4,7.13333333 C18.0627417,6.24967773 19.3163444,6.07059163 20.2,6.73333333 C20.3516113,6.84704183 20.4862915,6.981722 20.6,7.13333333 Z"
+                                id="path-5"
+                        ></path>
+                      </defs>
+                      <g id="g-app-brand" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+                        <g id="Brand-Logo" transform="translate(-27.000000, -15.000000)">
+                          <g id="Icon" transform="translate(27.000000, 15.000000)">
+                            <g id="Mask" transform="translate(0.000000, 8.000000)">
+                              <mask id="mask-2" fill="white">
+                                <use xlink:href="#path-1"></use>
+                              </mask>
+                              <use fill="#696cff" xlink:href="#path-1"></use>
+                              <g id="Path-3" mask="url(#mask-2)">
+                                <use fill="#696cff" xlink:href="#path-3"></use>
+                                <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-3"></use>
+                              </g>
+                              <g id="Path-4" mask="url(#mask-2)">
+                                <use fill="#696cff" xlink:href="#path-4"></use>
+                                <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-4"></use>
+                              </g>
+                            </g>
+                            <g
+                                    id="Triangle"
+                                    transform="translate(19.000000, 11.000000) rotate(-300.000000) translate(-19.000000, -11.000000) "
+                            >
+                              <use fill="#696cff" xlink:href="#path-5"></use>
+                              <use fill-opacity="0.2" fill="#FFFFFF" xlink:href="#path-5"></use>
+                            </g>
+                          </g>
+                        </g>
+                      </g>
+                    </svg>
+                  </span>
+                            <span class="app-brand-text demo text-body fw-bolder">RACL</span>
+                        </a>
+                    </div>
+                    <h4 class="mb-2">회원가입 🚀</h4>
+                    <p class="mb-4">RACL WMS와 함께 비즈니스를 시작하세요.</p>
+
+                    <form id="formRegistration" class="mb-3" method="POST" action="/member/register">
+                        <!-- 아이디 -->
+                        <div class="mb-3">
+                            <label for="memberLoginId" class="form-label">아이디 <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="memberLoginId" name="memberLoginId"
+                                       placeholder="영문, 숫자 조합 4-20자" required />
+                            </div>
+                            <div id="idError" class="error-message"></div>
+                            <div id="idSuccess" class="success-message"></div>
+                        </div>
+
+                        <!-- 비밀번호 -->
+                        <div class="mb-3">
+                            <label for="memberPw" class="form-label">비밀번호 <span class="text-danger">*</span></label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" id="memberPw" class="form-control" name="memberPw"
+                                       placeholder="영문, 숫자, 특수문자 조합 8-20자" required />
+                                <span class="input-group-text cursor-pointer" id="togglePw"><i class="bx bx-hide"></i></span>
+                            </div>
+                            <div id="pwError" class="error-message"></div>
+                        </div>
+
+                        <!-- 비밀번호 확인 -->
+                        <div class="mb-3">
+                            <label for="memberPwConfirm" class="form-label">비밀번호 확인 <span class="text-danger">*</span></label>
+                            <div class="input-group input-group-merge">
+                                <input type="password" id="memberPwConfirm" class="form-control"
+                                       placeholder="비밀번호를 다시 입력하세요" required />
+                                <span class="input-group-text cursor-pointer" id="togglePwConfirm"><i class="bx bx-hide"></i></span>
+                            </div>
+                            <div id="pwConfirmError" class="error-message"></div>
+                        </div>
+
+                        <!-- 이름 -->
+                        <div class="mb-3">
+                            <label for="memberName" class="form-label">이름 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="memberName" name="memberName"
+                                   placeholder="이름을 입력하세요" required />
+                            <div id="nameError" class="error-message"></div>
+                        </div>
+
+                        <!-- 전화번호 -->
+                        <div class="mb-3">
+                            <label for="memberPhone" class="form-label">전화번호 <span class="text-danger">*</span></label>
+                            <input type="tel" class="form-control" id="memberPhone" name="memberPhone"
+                                   placeholder="010-1234-5678" required />
+                            <div id="phoneError" class="error-message"></div>
+                        </div>
+
+                        <!-- 이메일 -->
+                        <div class="mb-3">
+                            <label for="memberEmail" class="form-label">이메일 <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="memberEmail" name="memberEmail"
+                                   placeholder="example@email.com" required />
+                            <div id="emailError" class="error-message"></div>
+                        </div>
+
+                        <!-- 사업자번호 -->
+                        <div class="mb-3">
+                            <label for="businessNumber" class="form-label">사업자등록번호 <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="businessNumber" name="businessNumber"
+                                   placeholder="123-45-67890" required />
+                            <div id="businessError" class="error-message"></div>
+                        </div>
+
+                        <div class="mb-3">
+                            <button class="btn btn-primary d-grid w-100" type="submit" id="submitBtn" disabled>회원가입</button>
+                        </div>
+                    </form>
+
+                        <p class="text-center">
+                            <span>처음이신가요? </span>
+                            <a href="/member/login">
+                                <span>회원가입</span>
+                            </a>
+                        </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const form = document.getElementById('formRegistration');
+        const submitBtn = document.getElementById('submitBtn');
+
+        const requiredFields = [
+            'memberLoginId',
+            'memberPw',
+            'memberPwConfirm',
+            'memberName',
+            'memberPhone',
+            'memberEmail',
+            'businessNumber'
+        ];
+
+        function checkFormFilled() {
+            const allFilled = requiredFields.every(id => {
+                const input = document.getElementById(id);
+                return input && input.value.trim() !== '';
+            });
+
+            submitBtn.disabled = !allFilled;
+        }
+
+        // 각 필드에 이벤트 리스너 등록
+        requiredFields.forEach(id => {
+            const input = document.getElementById(id);
+            if (input) {
+                input.addEventListener('input', checkFormFilled);
+            }
+        });
+    });
+</script>
+
+
+<script src="${pageContext.request.contextPath}/resources/assets/vendor/libs/jquery/jquery.js"></script>
+<script src="${pageContext.request.contextPath}/resources/assets/vendor/libs/popper/popper.js"></script>
+<script src="${pageContext.request.contextPath}/resources/assets/vendor/js/bootstrap.js"></script>
+<script src="${pageContext.request.contextPath}/resources/assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js"></script>
+
+<script src="${pageContext.request.contextPath}/resources/assets/vendor/js/menu.js"></script>
+<script src="${pageContext.request.contextPath}/resources/assets/js/main.js"></script>
+
+<script async defer src="https://buttons.github.io/buttons.js"></script>
+</body>
+</html>

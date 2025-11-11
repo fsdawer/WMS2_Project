@@ -14,7 +14,7 @@
             content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
     />
 
-    <title>Login</title>
+    <title>Login(Member) | RACL WMS</title>
 
     <meta name="description" content=""/>
 
@@ -149,7 +149,7 @@
 
                         <p class="text-center">
                             <span>처음이신가요? </span>
-                            <a href="/register">
+                            <a href="/member/register">
                                 <span>회원가입</span>
                             </a>
                         </p>

@@ -35,7 +35,7 @@ public class MemberController {
         return "member/login";
     }
 
-    @PostMapping("/login")
+    @PostMapping("")
     public String postMemberLogin(@RequestParam("loginId") String id,
                                   HttpSession session,
                                   Model model) {

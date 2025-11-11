@@ -2,7 +2,17 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 <%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
-<%@ include file="../admin/admin-header.jsp" %>
+<c:choose>
+    <c:when test="${sessionScope.role eq 'ADMIN'}">
+        <jsp:include page="/WEB-INF/views/admin/admin-header.jsp" />
+    </c:when>
+    <c:when test="${sessionScope.role eq 'MANAGER'}">
+        <jsp:include page="/WEB-INF/views/manager/manager-header.jsp" />
+    </c:when>
+    <c:otherwise>
+        <jsp:include page="/WEB-INF/views/member/member-header.jsp" />
+    </c:otherwise>
+</c:choose>
 <div class="container">
     <h1>공지사항</h1>
 
@@ -83,4 +93,14 @@
         </div>
     </c:if>
 </div>
-<%@ include file="../admin/admin-footer.jsp" %>
+<c:choose>
+    <c:when test="${sessionScope.role eq 'ADMIN'}">
+        <jsp:include page="/WEB-INF/views/admin/admin-footer.jsp" />
+    </c:when>
+    <c:when test="${sessionScope.role eq 'MANAGER'}">
+        <jsp:include page="/WEB-INF/views/manager/manager-footer.jsp" />
+    </c:when>
+    <c:otherwise>
+        <jsp:include page="/WEB-INF/views/member/member-footer.jsp" />
+    </c:otherwise>
+</c:choose>

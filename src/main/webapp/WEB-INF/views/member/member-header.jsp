@@ -116,7 +116,7 @@
                   </g>
                 </svg>
               </span>
-                    <span class="app-brand-text demo menu-text fw-bolder ms-2">RACL WMS</span>
+                    <span class="app-brand-text demo menu-text fw-bolder ms-2">RACL</span>
                 </a>
 
                 <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto d-block d-xl-none">
@@ -216,12 +216,12 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/announcements" class="menu-link">
                                 <div data-i18n="Account">공지사항</div>
                             </a>
                         </li>
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/inquiries" class="menu-link">
                                 <div data-i18n="Account">문의사항</div>
                             </a>
                         </li>
@@ -269,8 +269,8 @@
                                                 </div>
                                             </div>
                                             <div class="flex-grow-1">
-                                                <span class="fw-semibold d-block">사용자 이름 입력</span>
-                                                <small class="text-muted">권한 입력</small>
+                                                <span class="fw-semibold d-block">${loginId != null ? loginId : 'Member'}</span>
+                                                <small class="text-muted">직원</small>
                                             </div>
                                         </div>
                                     </a>
@@ -279,7 +279,7 @@
                                     <div class="dropdown-divider"></div>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="#">
+                                    <a class="dropdown-item" href="${pageContext.request.contextPath}/member/mypage">
                                         <i class="bx bx-user me-2"></i>
                                         <span class="align-middle">My Page</span>
                                     </a>
@@ -288,7 +288,7 @@
                                     <div class="dropdown-divider"></div>
                                 </li>
                                 <li>
-                                    <a class="dropdown-item" href="html/auth-login-basic.html">
+                                    <a class="dropdown-item" href="${pageContext.request.contextPath}/admin/logout">
                                         <i class="bx bx-power-off me-2"></i>
                                         <span class="align-middle">Log Out</span>
                                     </a>
