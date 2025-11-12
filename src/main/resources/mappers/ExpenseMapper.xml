@@ -101,4 +101,11 @@
         WHERE expense_id = #{id}
     </update>
 
+    <select id="findTotalExpenseByMonth" resultType="long">
+        SELECT COALESCE(SUM(amount), 0)
+        FROM expense
+        WHERE YEAR(expense_date) = #{year}
+          AND MONTH(expense_date) = #{month}
+    </select>
+
 </mapper>

@@ -25,6 +25,7 @@
         </div>
     </div>
 
+    <%-- 1. 연간 요약 카드 --%>
     <div class="row">
         <div class="col-lg-4 col-md-6 col-12 mb-4">
             <div class="card">
@@ -79,7 +80,63 @@
         </div>
     </div>
 
-    <h5 class="pb-1 mb-4 text-muted" id="logisticsTitle">물류 현황 (이번 달)</h5>
+    <%-- 2. 월간 요약 카드 --%>
+    <div class="row" id="monthlySummaryRow" style="display: none;">
+        <div class="col-lg-4 col-md-6 col-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
+                        <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
+                            <div class="card-title">
+                                <h5 class="text-nowrap mb-2">월 매출</h5>
+                                <span class="badge bg-label-success rounded-pill">Monthly</span>
+                            </div>
+                            <div class="mt-sm-auto">
+                                <h3 class="mb-0" id="monthlySales">Loading...</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
+                        <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
+                            <div class="card-title">
+                                <h5 class="text-nowrap mb-2">월 지출</h5>
+                                <span class="badge bg-label-danger rounded-pill">Monthly</span>
+                            </div>
+                            <div class="mt-sm-auto">
+                                <h3 class="mb-0" id="monthlyExpense">Loading...</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4 col-md-6 col-12 mb-4">
+            <div class="card">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between flex-sm-row flex-column gap-3">
+                        <div class="d-flex flex-sm-column flex-row align-items-start justify-content-between">
+                            <div class="card-title">
+                                <h5 class="text-nowrap mb-2">월 순수익</h5>
+                                <span class="badge bg-label-primary rounded-pill">Monthly</span>
+                            </div>
+                            <div class="mt-sm-auto">
+                                <h3 class="mb-0 text-primary" id="monthlyNetProfit">Loading...</h3>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <%-- 3. 물류 현황 카드 (HTML은 사용자가 제공한 JSP에 없음, 하지만 JS에는 있음) --%>
+    <h5 class="pb-1 mb-4 text-muted" id="logisticsTitle">물류 현황</h5>
     <div class="row">
         <div class="col-lg-6 col-md-12 mb-4">
             <div class="card h-100">
@@ -119,6 +176,7 @@
         </div>
     </div>
 
+    <%-- 4. 차트 (HTML은 기존 코드 사용) --%>
     <div class="row">
         <div class="col-md-8 col-lg-8 order-1 mb-4">
             <div class="card h-100">
@@ -157,6 +215,9 @@
 </div>
 <%@ include file="../admin/admin-footer.jsp" %>
 
+<%-- ========================================================== --%>
+<%--                JAVASCRIPT                --%>
+<%-- ========================================================== --%>
 <script>
     const CONTEXT_PATH = '${pageContext.request.contextPath}';
     const API_URL = CONTEXT_PATH + '/dashboard/api';
@@ -188,12 +249,10 @@
         const mainChartEl = document.querySelector("#mainChart");
         if (mainChartEl) {
             const mainChartOptions = {
-                // --- ▼ [수정 1] 빈 배열 대신 0으로 채워진 데이터로 초기화 ---
                 series: [
                     {name: '매출', data: Array(12).fill(0)},
                     {name: '지출', data: Array(12).fill(0)}
                 ],
-                // --- ▲ 수정 완료 ---
                 chart: {
                     height: 300,
                     type: 'bar',
@@ -217,10 +276,10 @@
                 stroke: {show: true, width: 2, colors: ['transparent']},
                 colors: ['#696cff', '#ff3e1d'],
                 xaxis: {categories: ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']},
-                // --- (Y축 설정은 그대로) ---
                 yaxis: {
                     min: 0,
                     tickAmount: 5, // Y축 눈금 개수 5개로 제한
+                    forceNiceScale: true, // 숫자로 강제 변환
                     labels: {
                         formatter: (val) => formatKoreanNumber(val),
                         hideOverlappingLabels: true, // 겹치는 라벨 자동 숨김
@@ -233,9 +292,6 @@
                 grid: {borderColor: '#f1f1f1'},
                 legend: {position: 'top', horizontalAlign: 'left', markers: {radius: 12}},
                 tooltip: {y: {formatter: (val) => formatCurrency(val) + " 원"}},
-                // --- ▼ [수정 2] noData 옵션 제거 ---
-                // noData: {text: '데이터 로딩 중...'}
-                // --- ▲ 수정 완료 ---
             };
             mainChart = new ApexCharts(mainChartEl, mainChartOptions);
             mainChart.render();
@@ -249,7 +305,6 @@
                 chart: {
                     height: 240,
                     type: 'radialBar',
-                    /*sparkline: {enabled: true}*/ // sparkline 주석 처리 (유지)
                 },
                 animations: { // 애니메이션 설정 (유지)
                     enabled: true,
@@ -282,12 +337,23 @@
 
     }
 
+    // --- loadDashboardData 함수 ---
     function loadDashboardData(year, month) {
+
+        // --- 월 선택 여부에 따라 월간 요약 카드 숨기기/보이기 ---
+        if (month == 0) {
+            // "연간 전체" 선택 시: 월간 요약 숨기기
+            $('#monthlySummaryRow').hide();
+        } else {
+            // 특정 월 선택 시: 월간 요약 보이기
+            $('#monthlySummaryRow').show();
+        }
+
         $.ajax({
             url: API_URL, type: 'GET', data: {year: year, month: month}, dataType: 'json',
             success: function (data) {
                 updateTitles(data.selectedYear, data.selectedMonth, month == 0);
-                updateSummaryCards(data);
+                updateSummaryCards(data); // <-- 이 함수가 새 데이터를 처리
 
                 // 메인 차트 (막대)
                 const monthlySales = Array(12).fill(0);
@@ -331,7 +397,7 @@
     }
 
 
-    // [추가] 숫자 카운트업 애니메이션 함수
+    // 숫자 카운트업 애니메이션 함수
     function animateCountUp(elementId, endValue) {
         const el = document.getElementById(elementId);
         const duration = 1000; // 애니메이션 지속 시간 (1.0초)
@@ -359,15 +425,23 @@
         el.animator = requestAnimationFrame(animation);
     }
 
-    // 모든 요약 카드 애니메이션을 호출하는 함수 (최종 수정본)
+    // --- updateSummaryCards 함수 ---
     function updateSummaryCards(data) {
+        // 기존 연간 데이터
         animateCountUp('totalSales', data.totalSales);
         animateCountUp('totalExpense', data.totalExpense);
         animateCountUp('netProfit', data.netProfit);
 
+        // --- 새로운 월간 데이터 애니메이션 ---
+        // (Controller에서 보낸 'monthlySales' 등을 사용)
+        animateCountUp('monthlySales', data.monthlySales);
+        animateCountUp('monthlyExpense', data.monthlyExpense);
+        animateCountUp('monthlyNetProfit', data.monthlyNetProfit);
+
         // 수익률 퍼센트 애니메이션
         animatePercentageUp('profitMarginText', data.profitMargin);
 
+        // 물류 카운트
         $('#monthlyInbound').text((data.monthlyInboundCount || 0) + ' 건');
         $('#monthlyOutbound').text((data.monthlyOutboundCount || 0) + ' 건');
 
@@ -412,7 +486,7 @@
         el.animator = requestAnimationFrame(animation);
     }
 
-    // [추가] 전월/전년 대비(%) 증감 애니메이션 함수
+    // 전월/전년 대비(%) 증감 애니메이션 함수
     function animateGrowthPercentage(elementId, endValue) {
         const el = document.getElementById(elementId);
         const duration = 1000; // 1초

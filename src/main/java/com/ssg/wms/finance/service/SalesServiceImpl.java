@@ -1,6 +1,7 @@
 package com.ssg.wms.finance.service;
 
 import com.ssg.wms.finance.domain.SalesVO;
+import com.ssg.wms.finance.dto.SalesPartnerDTO;
 import com.ssg.wms.finance.dto.SalesRequestDTO;
 import com.ssg.wms.finance.dto.SalesResponseDTO;
 import com.ssg.wms.finance.dto.SalesSaveDTO;
@@ -71,5 +72,10 @@ public class SalesServiceImpl implements SalesService {
     @Override
     public void deleteSales(Long id) {
         salesMapper.delete(id);
+    }
+
+    @Override
+    public List<SalesPartnerDTO> getPartnerList() {
+        return salesMapper.selectPartnerList();
     }
 }

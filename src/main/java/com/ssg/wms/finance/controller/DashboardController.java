@@ -1,9 +1,7 @@
 package com.ssg.wms.finance.controller;
 
-// import com.ssg.wms.finance.dto.CategorySummaryDTO; // (제거)
 import com.ssg.wms.finance.dto.DashboardSummaryDTO;
 import com.ssg.wms.finance.service.DashboardService;
-// import com.ssg.wms.finance.service.ExpenseService; // (제거)
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +25,6 @@ import java.util.Map;
 public class DashboardController {
 
     private final DashboardService dashboardService;
-    // private final ExpenseService expenseService; // (제거)
 
     @GetMapping
     public String dashboard(Model model) {
@@ -41,24 +38,36 @@ public class DashboardController {
             @RequestParam(required = false, defaultValue = "0") int month) {
 
         if (year == 0) year = Year.now().getValue();
+        // "연간 전체"가 아닐 때의 월(month)과, "연간 전체"일 때 물류 카운트에 사용할 월(queryMonth)을 분리
         int queryMonth = (month == 0) ? LocalDate.now().getMonthValue() : month;
 
-        // 1. 데이터 조회
+        // 1. 연간 차트 데이터 조회
         List<DashboardSummaryDTO> netProfitSummary = dashboardService.getNetProfitSummary(year);
 
-        // 2. [삭제] 월별 카테고리 지출 조회 로직 삭제
-
-        // 3. 월간 물류
+        // 2. 월간 물류 데이터 조회
         int inboundCount = dashboardService.getMonthlyInboundCount(year, queryMonth);
         int outboundCount = dashboardService.getMonthlyOutboundCount(year, queryMonth);
 
-        // 4. 연간 총합 계산
+        // --- ▼ [신규 추가] 3. 월간 카드용 데이터 조회 ---
+        long monthlySales = 0;
+        long monthlyExpense = 0;
+        long monthlyNetProfit = 0;
+
+        if (month != 0) { // "연간 전체"(value 0)가 아닐 때만 계산
+            // (이 메서드들은 이전 단계에서 Service/Mapper에 추가한 것을 호출)
+            monthlySales = dashboardService.getMonthlySales(year, month);
+            monthlyExpense = dashboardService.getMonthlyExpense(year, month);
+            monthlyNetProfit = monthlySales - monthlyExpense;
+        }
+        // --- ▲ [신규 추가] ---
+
+        // 4. 연간 총합 계산 (기존 로직)
         long totalSales = netProfitSummary.stream().mapToLong(DashboardSummaryDTO::getTotalSales).sum();
         long totalExpense = netProfitSummary.stream().mapToLong(DashboardSummaryDTO::getTotalExpenses).sum();
         long netProfit = totalSales - totalExpense;
         double profitMargin = (totalSales == 0) ? 0.0 : ((double) netProfit / totalSales) * 100;
 
-        // 5. 전월/전년 대비 계산
+        // 5. 전월/전년 대비 계산 (기존 로직)
         List<DashboardSummaryDTO> prevYearSummary = dashboardService.getNetProfitSummary(year - 1);
         long prevYearSameMonthProfit = prevYearSummary.get(queryMonth - 1).getNetProfit();
         long prevMonthProfit = (queryMonth == 1) ? prevYearSummary.get(11).getNetProfit() : netProfitSummary.get(queryMonth - 2).getNetProfit();
@@ -68,20 +77,33 @@ public class DashboardController {
 
         // 6. 응답 데이터 구성
         Map<String, Object> response = new HashMap<>();
+
+        // (연간 차트용)
         response.put("netProfitSummary", netProfitSummary);
 
-        // response.put("monthlyExpenseSummary", monthlyExpenseSummary); // [삭제]
-
+        // (연간 카드용)
         response.put("totalSales", totalSales);
         response.put("totalExpense", totalExpense);
         response.put("netProfit", netProfit);
         response.put("profitMargin", profitMargin);
+
+        // (월간 물류 카드용)
         response.put("monthlyInboundCount", inboundCount);
         response.put("monthlyOutboundCount", outboundCount);
+
+        // (필터 상태용)
         response.put("selectedYear", year);
         response.put("selectedMonth", queryMonth);
+
+        // (연간 수익률 카드용)
         response.put("profitGrowthMoM", profitGrowthMoM);
         response.put("profitGrowthYoY", profitGrowthYoY);
+
+        // --- ▼ [신규 추가] 7. 월간 카드용 데이터 추가 ---
+        response.put("monthlySales", monthlySales);
+        response.put("monthlyExpense", monthlyExpense);
+        response.put("monthlyNetProfit", monthlyNetProfit);
+        // --- ▲ [신규 추가] ---
 
         return ResponseEntity.ok(response);
     }

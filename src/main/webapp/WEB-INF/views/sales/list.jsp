@@ -84,11 +84,33 @@
                 <div class="row g-2">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">고객사명 <span class="text-danger">*</span></label>
-                        <input type="text" id="modalClientName" class="form-control" placeholder="예: (주)SSG"/>
+                        <%-- ▼ [수정] input을 select로 변경 --%>
+                        <select id="modalClientName" class="form-select">
+                            <option value="">고객사를 선택하세요</option>
+
+                            <%-- 1단계에서 Controller가 넘겨준 ${partnerList}를 사용 --%>
+                            <c:forEach var="partner" items="${partnerList}">
+                                <%--
+                                  Sales 테이블은 이름을 저장하므로 value에 이름을 넣습니다.
+                                  (partnerName은 PartnerDTO의 필드명으로 가정)
+                                --%>
+                                <option value="${partner.partnerName}">${partner.partnerName}</option>
+                            </c:forEach>
+                        </select>
+                        <%-- ▲ [수정] ---%>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">창고명 <span class="text-danger">*</span></label>
-                        <input type="text" id="modalWarehouseName" class="form-control" placeholder="예: 김포 물류센터"/>
+                        <%-- ▼ [수정] input을 select로 변경 --%>
+                        <select id="modalWarehouseName" class="form-select">
+                            <option value="">창고를 선택하세요</option>
+
+                            <%-- 1단계에서 Controller가 넘겨준 ${warehouseList}를 사용 --%>
+                            <c:forEach var="warehouse" items="${warehouseList}">
+                                <option value="${warehouse.warehouseName}">${warehouse.warehouseName}</option>
+                            </c:forEach>
+                        </select>
+                        <%-- ▲ [수정] ---%>
                     </div>
                 </div>
                 <div class="mb-3">
@@ -174,7 +196,7 @@
                 <td>\${formattedDate}</td>
                 <td><strong>\${item.clientName}</strong></td>
                 <td>\${item.warehouseName}</td>
-                <td><span class="badge bg-label-success">\${item.category}</span></td>
+                <td><span class="text-success fw-bold">\${item.category}</span></td>
                 <td class="text-end fw-bold text-success">\${amt}원</td>
                 <td>\${item.description || '-'}</td>
             </tr>`);

@@ -22,4 +22,6 @@ public interface ExpenseMapper {
 
     // 생성된 관리번호(expense_code)를 업데이트하기 위한 메서드
     void updateCode(@Param("id") Long id, @Param("expenseCode") String expenseCode);
+
+    long findTotalExpenseByMonth(@Param("year") int year, @Param("month") int month);
 }

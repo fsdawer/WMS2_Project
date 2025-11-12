@@ -89,4 +89,18 @@
         SET sales_code = #{salesCode}
         WHERE sales_id = #{id} </update>
 
+    <select id="selectPartnerList" resultType="com.ssg.wms.finance.dto.SalesPartnerDTO">
+        SELECT partner_id   as partnerId,
+               partner_name as partnerName
+        FROM Partner
+        ORDER BY partner_name ASC
+    </select>
+
+    <select id="findTotalSalesByMonth" resultType="long">
+        SELECT COALESCE(SUM(amount), 0)
+        FROM sales
+        WHERE YEAR(sales_date) = #{year}
+          AND MONTH(sales_date) = #{month}
+    </select>
+
 </mapper>

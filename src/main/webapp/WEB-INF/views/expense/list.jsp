@@ -84,7 +84,19 @@
                 <div class="row g-2">
                     <div class="col-md-6 mb-3">
                         <label class="form-label">창고명 <span class="text-danger">*</span></label>
-                        <input type="text" id="modalWarehouseName" class="form-control" placeholder="예: 서울 제1창고"/>
+                        <select id="modalWarehouseName" class="form-select">
+                            <option value="">창고를 선택하세요</option>
+
+                            <%-- 1단계에서 Controller가 넘겨준 ${warehouseList}를 사용 --%>
+                            <c:forEach var="warehouse" items="${warehouseList}">
+                                <%--
+                                  [중요]
+                                  DB의 Expense 테이블은 창고 'ID'가 아닌 '이름(warehouse_name)'을 저장합니다.
+                                  따라서 value에 ID가 아닌 이름을 넣어야 합니다.
+                                --%>
+                                <option value="${warehouse.warehouseName}">${warehouse.warehouseName}</option>
+                            </c:forEach>
+                        </select>
                     </div>
                     <div class="col-md-6 mb-3">
                         <label class="form-label">카테고리 <span class="text-danger">*</span></label>
@@ -174,7 +186,7 @@
                 <td>\${item.expenseCode}</td>
                 <td>\${formattedDate}</td>
                 <td>\${item.warehouseName}</td>
-                <td><span class="badge bg-label-secondary">\${item.category}</span></td>
+                <td><span class="text-danger fw-bold">\${item.category}</span></td>
                 <td class="text-end fw-bold text-danger">\${amt}원</td>
                 <td>\${item.description || '-'}</td>
             </tr>`);
