@@ -33,6 +33,6 @@ public interface InboundMemberMapper {
     void insertInboundItemsBatch(List<InboundRequestItemDTO> items);
 
     // 입고 요청 취소
-
+    void cancelInbound(int inboundId);
 
 }

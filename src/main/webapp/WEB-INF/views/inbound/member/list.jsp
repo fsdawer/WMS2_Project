@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <% String contextPath = request.getContextPath(); %>
 <%@ include file="../../member/member-header.jsp" %>
@@ -281,10 +281,15 @@
 
         // 모달 열기
         function openInboundModal(inboundId) {
-            const inboundEl = document.getElementById('inboundId');
+            // 모달 root 먼저 가져오기
             const modalEl = document.getElementById('inboundModal');
-            console.log("inboundId element:", inboundEl);
-            console.log("modal element:", modalEl);
+            if (!modalEl) {
+                console.error('❌ inboundModal NOT found in current document.');
+                return;
+            }
+            const inboundModal = new bootstrap.Modal(modalEl);
+
+            // 데이터 조회
             axios.get('<%=contextPath%>/inbound/member/' + inboundId)
                 .then(function(response) {
                     const data = response.data;
@@ -293,41 +298,64 @@
                         return;
                     }
 
+                    // 모달 내부에서 요소들을 안전하게 가져오기
+                    const inboundInput          = modalEl.querySelector('#inboundId');
+                    const inboundStatusEl       = modalEl.querySelector('#inboundStatus');
+                    const warehouseIdEl         = modalEl.querySelector('#warehouseId');
+                    const warehouseNameEl       = modalEl.querySelector('#warehouseName');
+                    const partnerNameEl         = modalEl.querySelector('#partnerName');
+                    const memberIdEl            = modalEl.querySelector('#memberId');
+                    const memberNameEl          = modalEl.querySelector('#memberName');
+                    const staffIdEl             = modalEl.querySelector('#staffId');
+                    const staffNameEl           = modalEl.querySelector('#staffName');
+                    const inboundRequestedAtEl  = modalEl.querySelector('#inboundRequestedAt');
+                    const inboundAtEl           = modalEl.querySelector('#inboundAt');
+                    const rejectSection         = modalEl.querySelector('#rejectReasonSection');
+                    const inboundRejectReasonEl = modalEl.querySelector('#inboundRejectReason');
 
-                    $('#inboundModal').data('inbound-id', inboundId);
-                    $('#inboundModal').data('partnerId', data.partnerId);
-                    $('#inboundModal').data('categories', data.categories || []);
-                    // $('#inboundModal').data('member-id', data.memberId);
-
-
-                    document.getElementById('inboundId').value = data.inboundId || '';
-                    document.getElementById('inboundStatus').value = data.inboundStatusKor || '';
-                    document.getElementById('warehouseId').value = data.warehouseId || '';
-                    document.getElementById('warehouseName').value = data.warehouseName || '미지정';
-                    document.getElementById('partnerName').value = data.partnerName || '';
-                    document.getElementById('memberId').value = data.memberId || '';
-                    document.getElementById('memberName').value = data.memberName || '';
-                    document.getElementById('staffId').value = data.staffId || '';
-                    document.getElementById('staffName').value = data.staffName || '미지정';
-                    document.getElementById('inboundRequestedAt').value = formatDate(data.inboundRequestedAt);
-                    document.getElementById('inboundAt').value = formatDate(data.inboundAt) || '미지정';
-
-                    const rejectSection = document.getElementById('rejectReasonSection');
-                    if (data.inboundStatus === 'rejected' && data.inboundRejectReason) {
-                        document.getElementById('inboundRejectReason').value = data.inboundRejectReason;
-                        rejectSection.style.display = 'block';
-                    } else {
-                        rejectSection.style.display = 'none';
+                    if (!inboundInput) {
+                        console.error('❌ inboundId input not found INSIDE modal. modalEl.innerHTML snapshot:', modalEl.innerHTML.slice(0,500));
+                        return;
                     }
 
+                    // 데이터 채우기
+                    inboundInput.value = data.inboundId || '';
+                    if (inboundStatusEl) inboundStatusEl.value = data.inboundStatusKor || '';
+                    if (warehouseIdEl) warehouseIdEl.value = data.warehouseId || '';
+                    if (warehouseNameEl) warehouseNameEl.value = data.warehouseName || '미지정';
+                    if (partnerNameEl) partnerNameEl.value = data.partnerName || '';
+                    if (memberIdEl) memberIdEl.value = data.memberId || '';
+                    if (memberNameEl) memberNameEl.value = data.memberName || '';
+                    if (staffIdEl) staffIdEl.value = data.staffId || '';
+                    if (staffNameEl) staffNameEl.value = data.staffName || '미지정';
+                    if (inboundRequestedAtEl) inboundRequestedAtEl.value = formatDate(data.inboundRequestedAt);
+                    if (inboundAtEl) inboundAtEl.value = formatDate(data.inboundAt) || '미지정';
+
+                    // 반려 사유 표시
+                    if (data.inboundStatus === 'rejected' && data.inboundRejectReason) {
+                        if (inboundRejectReasonEl) inboundRejectReasonEl.value = data.inboundRejectReason;
+                        if (rejectSection) rejectSection.style.display = 'block';
+                    } else {
+                        if (rejectSection) rejectSection.style.display = 'none';
+                    }
+
+                    // 상품 렌더링
                     renderInboundItems(data.inboundItems, data.categories || []);
+
+                    // 모달 열기
                     inboundModal.show();
+
+                    // 모달에 데이터 저장 (전역 사용 가능)
+                    $(modalEl).data('inbound-id', inboundId);
+                    $(modalEl).data('partnerId', data.partnerId);
+                    $(modalEl).data('categories', data.categories || []);
                 })
                 .catch(function(err) {
                     console.error('입고 상세 조회 오류:', err);
                     alert('입고 상세 조회 중 오류가 발생했습니다.');
                 });
         }
+
 
         // 테이블 행 클릭
         $(document).on('click', '#inboundTableBody tr', function() {

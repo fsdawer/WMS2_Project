@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 
 <div class="modal fade" id="inboundModal" tabindex="-1" aria-labelledby="inboundModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-xl">
@@ -18,7 +18,7 @@
                         <div class="row mb-3">
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">입고 번호</label>
-                                <input type="text" id="inboundId" class="form-control" readonly>
+                                <input type="text" id="inboundId" name="inboundId" class="form-control" readonly>
                             </div>
                             <div class="col-md-4">
                                 <label class="form-label fw-bold">입고 상태</label>

@@ -166,11 +166,6 @@
     <update id="updateInbound" parameterType="com.ssg.wms.inbound.dto.InboundRequestDTO">
         UPDATE inbound
         SET
-        warehouse_id = #{warehouseId},
-        staff_id = #{staffId},
-        member_id = #{memberId},
-        inbound_status = #{inboundStatus},
-        inbound_reject_reason = #{inboundRejectReason},
         inbound_updated_at = NOW()
         WHERE inbound_id = #{inboundId}
     </update>
@@ -197,5 +192,13 @@
     </insert>
 
     <!-- 입고 요청 취소 -->
+    <update id="cancelInbound">
+        UPDATE inbound
+        SET
+        inbound_updated_at = NOW(),
+        inbound_status = 'cancelled'
+        WHERE inbound_id = #{inboundId}
+    </update>
+
 
 </mapper>
