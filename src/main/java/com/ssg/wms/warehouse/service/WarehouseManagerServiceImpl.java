@@ -6,7 +6,7 @@ import com.ssg.wms.warehouse.dto.WarehouseUpdateDTO;
 // AdminMapper를 사용해도 되지만, 관리의 용이성을 위해 ManagerMapper를 별도로 만들거나
 // 기존 AdminMapper의 이름을 수정하여 사용하는 것이 좋습니다.
 // 여기서는 제공된 코드 구조를 유지하며, 동일한 매퍼를 사용한다고 가정합니다.
-import com.ssg.wms.warehouse.mapper.WarehouseAdminMapper;
+import com.ssg.wms.warehouse.mappers.WarehouseAdminMapper;
 import com.ssg.wms.warehouse.util.KakaoApiUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;

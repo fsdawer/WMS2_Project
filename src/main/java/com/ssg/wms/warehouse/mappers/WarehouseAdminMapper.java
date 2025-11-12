@@ -1,4 +1,4 @@
-package com.ssg.wms.warehouse.mapper;
+package com.ssg.wms.warehouse.mappers;
 
 import com.ssg.wms.warehouse.dto.*;
 import org.apache.ibatis.annotations.Mapper;

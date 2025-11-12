@@ -1,7 +1,7 @@
 package com.ssg.wms.warehouse.service;
 
 import com.ssg.wms.warehouse.dto.*;
-import com.ssg.wms.warehouse.mapper.WarehouseAdminMapper;
+import com.ssg.wms.warehouse.mappers.WarehouseAdminMapper;
 import com.ssg.wms.warehouse.util.KakaoApiUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +13,7 @@ import java.util.List;
 @Log4j2
 @Service
 @Transactional
+
 public class WarehouseAdminServiceImpl implements WarehouseAdminService {
 
     private final WarehouseAdminMapper warehouseAdminMapper;

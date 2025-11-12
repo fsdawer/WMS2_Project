@@ -1,4 +1,4 @@
-package com.ssg.wms.warehouse.mapper;
+package com.ssg.wms.warehouse.mappers;
 
 import com.ssg.wms.warehouse.dto.WarehouseDetailDTO;
 import com.ssg.wms.warehouse.dto.WarehouseListDTO;

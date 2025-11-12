@@ -3,7 +3,7 @@ package com.ssg.wms.warehouse.service;
 import com.ssg.wms.warehouse.dto.WarehouseDetailDTO;
 import com.ssg.wms.warehouse.dto.WarehouseListDTO;
 import com.ssg.wms.warehouse.dto.WarehouseSearchDTO;
-import com.ssg.wms.warehouse.mapper.WarehouseMemberMapper; // DB 접근을 위한 Mapper 가정
+import com.ssg.wms.warehouse.mappers.WarehouseMemberMapper; // DB 접근을 위한 Mapper 가정
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
