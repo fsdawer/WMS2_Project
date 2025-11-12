@@ -15,7 +15,7 @@ import java.util.List;
 public interface OutboundOrderService {
     List<OutboundOrderDTO> getAllRequests(Criteria criteria, String search);
     List<OutboundOrderDTO> getFilteredOrders(Criteria criteria, String filterType, String searchValue);
-    OutboundOrderDTO getRequestDetailById(Long outboundRequestId);
+    OutboundOrderDTO getRequestDetailById(Long approvedOrderId);
     void updateOrderStatus(OutboundOrderDTO outboundOrderDTO);
 
 }

@@ -60,18 +60,18 @@
         </if>
     </select>
 
-    <!-- 운송장 등록 -->
-    <insert id="insertWaybill" parameterType="com.ssg.wms.outbound.domain.dto.WaybillDTO">
+    <!-- ✅ 운송장 생성 -->
+    <insert id="insertWaybill" parameterType="com.ssg.wms.outbound.domain.dto.OutboundOrderDTO">
         INSERT INTO waybill (
-        dispatch_id,
+        dispatch_ID,
         waybill_number,
-        waybill_status,
-        waybill_date
+        waybill_date,
+        waybill_Status
         ) VALUES (
         #{dispatchId},
         #{waybillNumber},
-        '출고대기',
-        NOW()
+        NOW(),
+        '출고대기'
         )
     </insert>
 

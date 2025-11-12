@@ -15,6 +15,7 @@ public class OutboundItemDTO {
     private Long outboundRequestId;     // 출고요청 ID (DB용)
     private String productId;             // JSON에서는 productId
     private Integer outboundQuantity;   // JSON에서는 outboundQuantity
-    private String productName;        
+    private String productName;
+    private String categoryCd;          // ✅ 추가 필요 (JSP에서 전송)
     private String categoryName;
 }

@@ -25,78 +25,103 @@ public class OutboundOrderServiceImpl implements OutboundOrderService {
     private final WaybillMapper waybillMapper;
 
 
-    //  출고지시서 전체 조회
     @Override
     public List<OutboundOrderDTO> getAllRequests(Criteria criteria, String search) {
         log.info("출고지시서 전체 조회 요청: {}", search);
         return outboundOrderMapper.getAllOrders(criteria, search);
     }
 
-    // 출고지시서 조건 조회(상태별로, 승인자별로 등등)
     @Override
     public List<OutboundOrderDTO> getFilteredOrders(Criteria criteria, String filterType, String searchValue) {
         log.info("출고지시서 조건 조회: 필터 타입={}, 값={}", filterType, searchValue);
         return outboundOrderMapper.getFilteredOrders(criteria, filterType, searchValue);
     }
 
-
-    // 출고지시서 상세조회
     @Override
-    public OutboundOrderDTO getRequestDetailById(Long outboundRequestId) {
-        log.info("출고지시서 상세 조회 요청: ID={}", outboundRequestId);
-        OutboundOrderDTO outboundOrderDTO = outboundOrderMapper.getOrderDetailById(outboundRequestId);
+    public OutboundOrderDTO getRequestDetailById(Long approvedOrderId) {
+        log.info("출고지시서 상세 조회 요청: approvedOrderId={}", approvedOrderId);
+        OutboundOrderDTO outboundOrderDTO = outboundOrderMapper.getOrderDetailById(approvedOrderId);
 
         if (outboundOrderDTO == null) {
-            throw new RuntimeException("출고지시서 ID를 찾을 수 없습니다: " + outboundRequestId);
+            throw new RuntimeException("출고지시서 ID를 찾을 수 없습니다: " + approvedOrderId);
         }
         return outboundOrderDTO;
     }
 
+    @Override
+    @Transactional
+    public void updateOrderStatus(OutboundOrderDTO outboundOrderDTO) {
+        log.info("✅ 출고지시서 상태 변경 시작");
+        log.info("✅ 데이터: {}", outboundOrderDTO);
 
-// 출고지시서 상태 변경 (승인/반려/취소 등)
+            // ✅ 1. 출고지시서 상태 업데이트
+            int updatedOrder = outboundOrderMapper.updateOrderStatus(outboundOrderDTO);
+            log.info("✅ 출고지시서 업데이트 완료: {} rows", updatedOrder);
 
-@Override
-@Transactional
-public void updateOrderStatus(OutboundOrderDTO outboundOrderDTO) {
-    // 1. 출고지시서 상태 업데이트
-    outboundOrderMapper.updateOrderStatus(outboundOrderDTO);
+            // ✅ 2. 출고요청 상태 업데이트
+            int updatedRequest = outboundOrderMapper.updateOutboundRequestStatus(
+                    outboundOrderDTO.getApprovedOrderID(),
+                    outboundOrderDTO.getApprovedStatus()
+            );
+            log.info("✅ 출고요청 상태 업데이트 완료: {} rows", updatedRequest);
 
-    // 2. 승인된 경우에만 배차 및 운송장 처리
-    if ("승인".equals(outboundOrderDTO.getOrderStatus())) {
+            // ✅ 3. 승인된 경우에만 배차 및 운송장 처리
+            if ("승인".equals(outboundOrderDTO.getApprovedStatus())) {
 
-        Long dispatchId = dispatchMapper.getDispatchIdByApprovedOrderId(outboundOrderDTO.getApprovedOrderID());
+                Long dispatchId = dispatchMapper.getDispatchIdByApprovedOrderId(
+                        outboundOrderDTO.getApprovedOrderID()
+                );
+                log.info("✅ 기존 배차 조회 결과: dispatchId={}", dispatchId);
 
-        if (dispatchId == null) {
-            // 🚀 Dispatch 신규 생성
-            dispatchMapper.insertDispatchInformation(outboundOrderDTO);
-            dispatchId = outboundOrderDTO.getDispatchId();
-        } else {
-            // 🚀 Dispatch 수정 — 여기서 DispatchDTO로 변환해서 전달
-            DispatchDTO dispatchDTO = DispatchDTO.builder()
-                    .dispatchId(dispatchId)
-                    .approvedOrderID(outboundOrderDTO.getApprovedOrderID())
-                    .carId(outboundOrderDTO.getCarId())
-                    .carType(outboundOrderDTO.getCarType())
-                    .driverName(outboundOrderDTO.getDriverName())
-                    .dispatchStatus(outboundOrderDTO.getDispatchStatus())
-                    .loadedBox(outboundOrderDTO.getLoadedBox())
-                    .maximumBox(outboundOrderDTO.getMaximumBOX())
-                    .build();
+                if (dispatchId == null) {
+                    // 🚀 Dispatch 신규 생성
+                    log.info("✅ 배차 정보 신규 생성 시작");
+                    log.info("   - approvedOrderID: {}", outboundOrderDTO.getApprovedOrderID());
+                    log.info("   - warehouseId: {}", outboundOrderDTO.getWarehouseId());
+                    log.info("   - carId: {}", outboundOrderDTO.getCarId());
+                    log.info("   - carType: {}", outboundOrderDTO.getCarType());
+                    log.info("   - driverName: {}", outboundOrderDTO.getDriverName());
 
-            dispatchMapper.updateDispatchInformation(dispatchDTO);
+                    dispatchMapper.insertDispatchInformation(outboundOrderDTO);
+                    dispatchId = outboundOrderDTO.getDispatchId();
+                    log.info("✅ 배차 정보 생성 완료: dispatchId={}", dispatchId);
+                } else {
+                    // 🚀 Dispatch 수정
+                    log.info("✅ 배차 정보 수정 시작: dispatchId={}", dispatchId);
+                    DispatchDTO dispatchDTO = DispatchDTO.builder()
+                            .dispatchId(dispatchId)
+                            .approvedOrderID(outboundOrderDTO.getApprovedOrderID())
+                            .carId(outboundOrderDTO.getCarId())
+                            .carType(outboundOrderDTO.getCarType())
+                            .driverName(outboundOrderDTO.getDriverName())
+                            .dispatchStatus(outboundOrderDTO.getDispatchStatus())
+                            .loadedBox(outboundOrderDTO.getLoadedBox())
+                            .maximumBox(outboundOrderDTO.getMaximumBOX())
+                            .build();
+
+                    dispatchMapper.updateDispatchInformation(dispatchDTO);
+                    log.info("✅ 배차 정보 수정 완료");
+                }
+
+                // 🚚 운송장 생성
+                log.info("✅ 운송장 생성 시작");
+                outboundOrderDTO.setDispatchId(dispatchId);
+                String newWaybillNumber = generateUniqueWaybillNumber();
+                outboundOrderDTO.setWaybillNumber(newWaybillNumber);
+
+                log.info("   - dispatchId: {}", dispatchId);
+                log.info("   - waybillNumber: {}", newWaybillNumber);
+
+                waybillMapper.insertWaybill(outboundOrderDTO);
+                log.info("✅ 운송장 생성 완료: {}", newWaybillNumber);
+            }
+
+            log.info("✅✅✅ 전체 프로세스 정상 완료 ✅✅✅");
+
         }
 
-        // 🚚 운송장 생성
-        outboundOrderDTO.setDispatchId(dispatchId);
-        String newWaybillNumber = generateUniqueWaybillNumber();
-        outboundOrderDTO.setWaybillNumber(newWaybillNumber);
-        waybillMapper.insertWaybill(outboundOrderDTO);
-    }
-}
 
 
-
-    // 운송장 번호 생성 도우미 메서드
     private String generateUniqueWaybillNumber() {
         return "WB-" + System.currentTimeMillis();
     }

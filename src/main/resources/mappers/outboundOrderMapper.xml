@@ -14,64 +14,46 @@
         <result property="productName" column="product_name"/>
     </resultMap>
 
-
-
-
     <!-- 출고지시 상세 매핑 -->
     <resultMap id="ShipmentOrderDetailMap" type="com.ssg.wms.outbound.domain.dto.OutboundOrderDTO">
-        <id property="approvedOrderID" column="approvedOrderID"/>
-        <result property="dispatchId" column="dispatchID"/>
-        <result property="carID" column="carID"/>
+        <id property="approvedOrderID" column="approvedOrder_ID"/>
+        <result property="dispatchId" column="dispatch_ID"/>
+        <result property="carId" column="carId"/>
+        <result property="carType" column="carType"/>
+        <result property="driverName" column="driverName"/>
+        <result property="dispatchStatus" column="dispatchStatus"/>
+        <result property="loadedBox" column="loadedBox"/>
+        <result property="maximumBOX" column="maximumBox"/>
         <result property="waybillNumber" column="waybillNumber"/>
         <result property="waybillStatus" column="waybillStatus"/>
     </resultMap>
 
-
-
-
+    <!-- 출고지시서 목록 매핑 -->
     <resultMap id="OutboundOrderListMap" type="com.ssg.wms.outbound.domain.dto.OutboundOrderDTO">
-        <id property="approvedOrderID" column="approvedOrder_ID"/>
-        <result property="outboundRequestID" column="outboundRequest_ID"/>
+        <id property="approvedOrderID" column="approvedOrderID"/>
+        <result property="outboundRequestID" column="outboundRequestID"/>
+        <result property="instructionNo" column="instructionNo"/>
         <result property="outboundDate" column="outboundDate"/>
         <result property="approvedStatus" column="approvedStatus"/>
-
-        <result property="partnerName" column="partner_name"/>
-        <result property="productName" column="product_name"/>
-
+        <result property="partnerName" column="partnerName"/>
+        <result property="driverName" column="driverName"/>
     </resultMap>
 
-
-
-
-
-    <!-- 출고오더 전체 목록 조회 -->
+    <!-- 출고지시서 전체 목록 -->
     <select id="getAllOrders" resultMap="OutboundOrderListMap">
         SELECT
-        so.approvedOrder_ID,
-        sr.outboundRequest_ID,
-        sr.outboundDate,
-        sr.approvedStatus,
-        Pt.partner_name,
-        Pd.product_name
-        FROM outboundOrder so
-        INNER JOIN outboundRequest sr ON so.outboundRequest_ID = sr.outboundRequest_ID
-        INNER JOIN outboundItem si ON sr.outboundRequest_ID = si.outboundRequest_ID
-        INNER JOIN Product Pd ON si.Product_ID = Pd.product_id
-        INNER JOIN Partner Pt ON Pd.partner_id = Pt.partner_id
-        <where>
-            <if test="search != null and search != ''">
-                (sr.outboundRequest_ID LIKE CONCAT('%', #{search}, '%')
-                OR Pt.partner_name LIKE CONCAT('%', #{search}, '%'))
-            </if>
-        </where>
-
-        GROUP BY
-        so.approvedOrder_ID,
-        sr.outboundRequest_ID,
-        sr.outboundDate,
-        sr.approvedStatus,
-        Pt.partner_name,
-        Pd.product_name
+        o.approvedOrder_ID AS approvedOrderID,
+        r.outboundRequest_ID AS outboundRequestID,
+        o.instructionNo AS instructionNo,
+        r.outboundDate,
+        r.approvedStatus,
+        p.partner_name AS partnerName,
+        m.member_name AS driverName
+        FROM outboundRequest r
+        LEFT JOIN outboundOrder o ON r.outboundRequest_ID = o.outboundRequest_ID
+        LEFT JOIN member m ON r.member_id = m.member_id
+        LEFT JOIN partner p ON m.partner_id = p.partner_id
+        ORDER BY r.outboundDate DESC
     </select>
 
     <!-- 필터링된 출고오더 조회 -->
@@ -110,37 +92,42 @@
         ORDER BY so.approvedOrder_ID DESC
     </select>
 
-    <!-- 출고지시 상세 조회 -->
-    <select id="getOrderDetailById" resultMap="ShipmentOrderDetailMap">
+    <!-- 출고지시서 상세 조회 -->
+    <select id="getOrderDetailById" resultType="com.ssg.wms.outbound.domain.dto.OutboundOrderDTO">
         SELECT
-        so.approvedOrder_ID,
-        so.outboundRequest_ID,
-        d.dispatchID,
-        d.carID,
-        d.CarType,
-        d.driverName,
-        d.assignedDate,
-        d.dispatchStatus,
-        d.loadedBOX AS 출고박스개수,
-        d.maximumBOX AS 차량최대적재량,
-        w.waybillNumber,
-        w.waybillStatus
-        FROM outboundOrder so
-        LEFT JOIN dispatch d ON so.approvedOrder_ID = d.approvedOrder_ID
-        LEFT JOIN waybill w ON d.dispatchID = w.dispatchID
-        WHERE so.approvedOrder_ID = #{approvedOrder_ID}
+        o.approvedOrder_ID AS approvedOrderID,
+        o.outboundRequest_ID AS outboundRequestID,
+        o.orderStatus,
+        r.outboundDate,
+        r.approvedStatus,
+        p.partner_name AS partnerName
+        FROM outboundOrder o
+        LEFT JOIN outboundRequest r ON o.outboundRequest_ID = r.outboundRequest_ID
+        LEFT JOIN member m ON r.member_id = m.member_id
+        LEFT JOIN partner p ON m.partner_id = p.partner_id
+        WHERE o.approvedOrder_ID = #{approvedOrderId}
     </select>
 
-
-
-    <!-- 출고오더 상태 수정 -->
+    <!-- ✅ 1. 출고지시서 상태만 업데이트 -->
     <update id="updateOrderStatus">
         UPDATE outboundOrder
         SET
-        orderStatus = #{outboundOrderDTO.orderStatus},
+        orderStatus = #{approvedStatus},
         approvedDate = NOW()
-        WHERE approvedOrder_ID = #{outboundOrderDTO.approvedOrderID}
+        WHERE approvedOrder_ID = #{approvedOrderID}
     </update>
 
+
+    <!-- ✅ 2. 출고요청 상태 업데이트 -->
+    <update id="updateOutboundRequestStatus">
+        UPDATE outboundRequest
+        SET
+        approvedStatus = #{approvedStatus}
+        WHERE outboundRequest_ID = (
+        SELECT outboundRequest_ID
+        FROM outboundOrder
+        WHERE approvedOrder_ID = #{approvedOrderId}
+        )
+    </update>
 
 </mapper>

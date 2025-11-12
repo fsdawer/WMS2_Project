@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -14,22 +15,37 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class OutboundDTO {
-    private Long outboundRequestId; // 	출고요청 고유번호
 
-    @JsonFormat(pattern="yyyy-MM-dd")
-    private LocalDate outboundDate; // 요청일자
+    private Long outboundRequestId;
+
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate outboundDate;
 
     private String approvedStatus;
     private String outboundAddress;
-
-    @JsonFormat(pattern="yyyy-MM-dd")
-    private LocalDate requestedDeliveryDate; // 출고 희망일
+    private String brandName;
+    private String requestUserName;
+    
+    @DateTimeFormat(pattern = "yyyy-MM-dd")
+    @JsonFormat(pattern = "yyyy-MM-dd")
+    private LocalDate requestedDeliveryDate;
 
     private Long memberId;
-    private Long staffId;
+    private String staffName;
+    private String staffId;
     private Long warehouseId;
+    private String dispatchStatus;
+    private String waybillNumber;
+    private String waybillStatus;
+    private List<OutboundItemDTO> outboundRequestItems;
 
-    private List<OutboundItemDTO> shipmentItems;
+    // ========== 배차 정보 ==========
+    private Long dispatchId;                    // 배차 ID
+    private Integer carId;                      // 차량 ID
+    private String carType;                     // 차량종류
+    private String driverName;                  // 기사이름
+    private Integer loadedBox;                  // 적재박스수
+    private Integer maximumBOX;                 // 최대적재량
 
 
 }

@@ -25,7 +25,7 @@
     <select id="getDispatchDetailById">
         select dispatch_ID, approvedOrder_ID, carID, Cartype, driverName, assignedDate, dispatchStatus, loadedBOX, maximumBOX
         from dispatch
-        where dispatch_ID = #{dispatchId};
+        where dispatch_ID = #{dispatchId}
     </select>
 
 
@@ -45,20 +45,24 @@
         assignedDate,
         dispatchStatus,
         loadedBOX,
-        maximumBOX )
+        maximumBOX
+        )
         VALUES (
         #{approvedOrderID},
-        #{carID},
+        #{carId},
         #{carType},
         #{driverName},
         NOW(),
         #{dispatchStatus},
-        #{loadedBOX},
+        #{loadedBox},
         100
         )
     </insert>
 
 
+
+
+    
     <update id="updateDispatchInformation" parameterType="com.ssg.wms.outbound.domain.dto.DispatchDTO">
         UPDATE dispatch
         SET
@@ -105,5 +109,17 @@
         dispatch_ID = #{dispatchId}
         AND approvedOrder_ID = #{approvedOrderId}
     </update>
+
+
+
+
+    <select id="getAllDrivers" resultType="com.ssg.wms.outbound.domain.dto.DispatchDTO">
+        SELECT
+        driver_name  AS driverName,
+        car_id       AS carId,
+        car_number   AS carNumber,  -- ✅ 추가
+        car_type     AS carType
+        FROM driver
+    </select>
 
 </mapper>

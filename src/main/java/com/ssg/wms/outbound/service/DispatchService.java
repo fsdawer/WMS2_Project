@@ -26,4 +26,6 @@ public interface DispatchService {
 
     // 운송장 번호 등록
     void insertMinimalWaybill(OutboundOrderDTO outboundOrderDTO);
+
+    List<DispatchDTO> getDistinctDrivers();
 }

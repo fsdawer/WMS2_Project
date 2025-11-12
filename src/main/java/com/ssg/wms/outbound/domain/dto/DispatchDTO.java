@@ -21,6 +21,8 @@ public class DispatchDTO {
     private int loadedBox;
     private int maximumBox;
     private Long shipmentOrderId;
+    private Long warehouseId;
+    private String carNumber;
 
     private Long approvedOrderID; // 출고지시서 인덱스
     private LocalDateTime approvedDate; // 승인일자
@@ -30,7 +32,6 @@ public class DispatchDTO {
     private LocalDateTime outboundDate; // 출고 요청일자 (JOIN을 통해 조회)
     private String orderStatus;
     private String WaybillNumber;
-    private int maximumBOX;
     private String partnerName;
     private String productName;
 }

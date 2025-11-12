@@ -20,13 +20,16 @@ public interface OutboundOrderMapper {
                                              @Param("filterType") String filterType,
                                              @Param("searchValue") String searchValue); // ★ 이 파라미터를 추가해야 합니다.
     // 출고지시서 상세조회
-    OutboundOrderDTO getOrderDetailById(@Param("outboundRequestId") Long outboundRequestId);
+    OutboundOrderDTO getOrderDetailById(@Param("approvedOrderId") Long approvedOrderId);
 
 
     // 출고지시서 상태 변경 (승인/반려/취소 등)
-    void updateOrderStatus(@Param("outboundOrderDTO") OutboundOrderDTO outboundOrderDTO);
+    int updateOrderStatus(OutboundOrderDTO outboundOrderDTO);
 
 
+    // ✅ 출고요청 상태 업데이트 (새로 추가)
+    int updateOutboundRequestStatus(@Param("approvedOrderId") Long approvedOrderId,
+                                    @Param("approvedStatus") String approvedStatus);
 
 
 }

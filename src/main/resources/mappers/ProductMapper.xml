@@ -14,9 +14,10 @@
         ORDER BY product_name
     </select>
 
+    
     <select id="selectCategory" resultType="com.ssg.wms.product_ehs.dto.CategoryDTO">
-        SELECT *
-        FROM category
+        SELECT
+        category_cd AS categoryCd,      category_name AS categoryName   FROM
+        category
     </select>
-
 </mapper>

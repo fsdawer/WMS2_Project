@@ -22,6 +22,7 @@ public class DispatchServiceImpl implements DispatchService {
     private final DispatchMapper dispatchMapper;
 
 
+
     // 기사 이름으로 배차 목록 조회
     @Override
     public List<DispatchDTO> getDispatchList(Criteria criteria, String driverName) {
@@ -43,11 +44,14 @@ public class DispatchServiceImpl implements DispatchService {
     public void insertDispatchInformation(OutboundOrderDTO outboundOrderDTO) {
         log.info("배차 정보 등록 요청: 지시서 ID={}", outboundOrderDTO.getApprovedOrderID());
 
+
+
         int loadedBox = outboundOrderDTO.getLoadedBox();
         int maximumBox = outboundOrderDTO.getMaximumBOX();
 
         if(loadedBox > maximumBox) {
             log.warn("배차 등록 실패: 적재량이 최대 적재량을 초과했습니다. 적재량={}, 최대={}", loadedBox, maximumBox);
+
 
             // 비즈니스 예외 발생
             throw new IllegalArgumentException("적재 박스 개수(" + loadedBox +
@@ -90,6 +94,15 @@ public class DispatchServiceImpl implements DispatchService {
 
         log.info("운송장 번호 {}가 dispatchId {}에 등록 완료되었습니다.", waybillNumber, dispatchId);
     }
+
+
+
+    @Override
+    public List<DispatchDTO> getDistinctDrivers() {
+        log.info("🚚 기사/차량 정보 중복 없이 조회 실행");
+        return dispatchMapper.getAllDrivers();
+    }
+
 
     /**
      * 고유한 운송장 번호 생성 (예시)

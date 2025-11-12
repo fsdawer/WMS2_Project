@@ -37,4 +37,7 @@ public interface DispatchMapper {
     // 적재 박스 개수만 업데이트하는 메서드 추가
     void updateLoadedBox(@Param("dispatchId") Long dispatchId,
                          @Param("loadedBox") Integer loadedBox);
+
+    // 🚚 중복 없는 기사/차량 목록 조회
+    List<DispatchDTO> getAllDrivers();
 }
