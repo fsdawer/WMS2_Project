@@ -282,7 +282,7 @@
             </select>
         </div>
 
-        <label for="warehouseCapacity">총 수용 용량 </label>
+        <label for="warehouseCapacity">총 수용 용량 (예 : ton)</label>
         <div class="input-group">
             <input type="text" id="warehouseCapacity" name="warehouseCapacity" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
         </div>
@@ -349,7 +349,7 @@
                             <option value="2">2층</option>
                         </select>
 
-                        <label>최대 부피 </label>
+                        <label>최대 부피 (단위 : m^3)</label>
                         <input type="text" name="sections[0].locations[0].maxVolume" required pattern="[0-9]*" title="숫자만 입력 가능합니다.">
                     </div>
                 </div>
