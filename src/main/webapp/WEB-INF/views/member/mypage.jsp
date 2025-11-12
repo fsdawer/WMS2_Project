@@ -1,4 +1,4 @@
-<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt" %>
 
@@ -16,7 +16,7 @@
                 <h5 class="card-header">프로필 정보</h5>
                 <div class="card-body">
                     <div class="d-flex align-items-start align-items-sm-center gap-4">
-                        <img src="${pageContext.request.contextPath}/assets/img/avatars/1.png"
+                        <img src="${pageContext.request.contextPath}/resources/assets/img/avatars/5.png"
                              alt="user-avatar" class="d-block rounded" height="100" width="100" id="uploadedAvatar"/>
                         <div class="button-wrapper">
                             <label for="upload" class="btn btn-primary me-2 mb-4" tabindex="0">
@@ -192,28 +192,25 @@
             return phoneRegex.test(phone);
         }
 
-        function showAlert(type = 'info', message = '') {
+        function showAlert(type = 'info', message = 'message') {
             const existingAlert = document.querySelector('.alert-custom');
             if (existingAlert) {
                 existingAlert.remove();
             }
 
             const alertDiv = document.createElement('div');
-            alertDiv.className = `alert alert-${type} alert-dismissible alert-custom`;
+            alertDiv.className = `alert alert-\${type} alert-dismissible alert-custom`;
             alertDiv.role = 'alert';
-            alertDiv.innerHTML = `
-            <span>${message}</span>
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        `;
+            alertDiv.innerHTML = `<span>\${message}</span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>`;
 
             form.insertAdjacentElement('beforebegin', alertDiv);
 
-            // setTimeout(() => {
-            //     alertDiv.remove();
-            // }, 3000);
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
         }
     });
 </script>
-
 <%-- 푸터 include (필수!) --%>
 <%@ include file="member-footer.jsp" %>

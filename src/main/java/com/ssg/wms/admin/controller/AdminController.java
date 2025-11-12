@@ -65,8 +65,11 @@ public class AdminController {
         // 로그인 ID -> 고유 ID 구하고 직원 정보 얻음
         long staffId = adminService.findStaffIdByStaffLoginId(id);
         StaffDTO staffDTO = adminService.getStaffDetails(staffId);
+        log.info("staffDTO: " + staffDTO);
 
-        model.addAttribute("staff", staffDTO);
+        // 세션에 저장하고 모델로 넘김
+        session.setAttribute("loginAdmin", staffDTO);
+        model.addAttribute("loginAdmin", staffDTO);
         return "admin/mypage";
     }
 

@@ -62,7 +62,9 @@ public class ManagerController {
         long staffId = managerService.findManagerIdByManagerLoginId(id);
         StaffDTO staffDTO = managerService.getManagerDetails(staffId);
 
-        model.addAttribute("manager", staffDTO);
+        // 세션에 저장하고 모델로 넘김
+        session.setAttribute("loginManager", staffDTO);
+        model.addAttribute("loginManager", staffDTO);
         return "manager/mypage";
     }
 
