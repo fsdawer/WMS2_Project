@@ -4,6 +4,10 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+// [참고] RoleCheckInterceptor와 StatusCheckInterceptor는
+// @RequiredArgsConstructor로 주입받는 것이 더 좋습니다.
+// (지금은 new()로 생성되어 있으니 그대로 둡니다.)
+
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
     @Override
@@ -12,7 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
         // 관리자와 창고관리자 둘 다 허용 (ADMIN, MANAGER)
         registry.addInterceptor(new RoleCheckInterceptor("ADMIN", "MANAGER"))
                 .addPathPatterns(
-
+                        // (여기에 향후 공통 페이지 추가, 예: "/stock/**")
                 );
 
         // 관리자만 허용 (ADMIN)
@@ -22,7 +26,14 @@ public class WebConfig implements WebMvcConfigurer {
                         "/announcements/*/edit",
                         "/announcements/*/delete",
                         "/admin/**",
-                        "*/admin/**")
+                        "*/admin/**",
+
+                        // --- ▼ [신규 추가] 재무관리 페이지 3개 ---
+                        "/dashboard/**",
+                        "/sales/**",
+                        "/expense/**"
+                        // --- ▲ [신규 추가] ---
+                )
                 .excludePathPatterns(
                         "/admin/login"
                 );
