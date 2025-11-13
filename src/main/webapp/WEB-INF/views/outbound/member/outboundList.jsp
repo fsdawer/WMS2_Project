@@ -22,10 +22,11 @@
                     <div class="col-md-3">
                         <label for="statusFilter" class="form-label">배송상태</label>
                         <select id="statusFilter" name="status" class="form-select">
-                            <option value="">-- 전체 --</option>
-                            <option value="승인대기" ${param.status eq '승인대기' ? 'selected' : ''}>승인대기</option>
-                            <option value="승인" ${param.status eq '승인' ? 'selected' : ''}>승인</option>
-                            <option value="반려" ${param.status eq '반려' ? 'selected' : ''}>반려</option>
+                            <option value="">-- 전체 --</option>₩
+                            <option value="PENDING">승인대기</option>
+                            <option value="APPROVED">승인</option>
+                            <option value="COMPANION">반려</option>
+
                         </select>
                     </div>
                     <div class="col-md-2 d-flex align-items-end">
@@ -97,7 +98,7 @@
 
             <!-- 하단 버튼 -->
             <div class="card-footer d-flex justify-content-between align-items-center">
-                <a href="${pageContext.request.contextPath}/member/outbound/request/form?memberId=${param.memberId}"
+                <a href="${pageContext.request.contextPath}/member/outbound/request/form?${param.memberId}"
                    class="btn btn-primary">출고요청 등록</a>
                 <div><nav><ul class="pagination"></ul></nav></div>
             </div>
@@ -130,7 +131,7 @@
                         let queryString = `?memberId=\${memberId}`;
                         if (status) queryString += `&status=\${status}`;
 
-                        const baseUrl = window.location.origin + contextPath + "/member/outbound";
+                        const baseUrl = window.location.origin + contextPath + "/member/outbound/list";
                         window.location.href = baseUrl + queryString;
                     });
                 }

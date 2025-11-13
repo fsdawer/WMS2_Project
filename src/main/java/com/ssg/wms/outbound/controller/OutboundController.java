@@ -1,5 +1,6 @@
 package com.ssg.wms.outbound.controller;
 
+import com.ssg.wms.member.dto.MemberDTO;
 import com.ssg.wms.outbound.domain.Criteria;
 import com.ssg.wms.outbound.domain.dto.OutboundDTO;
 import com.ssg.wms.outbound.service.OutboundService;
@@ -30,7 +31,10 @@ public class OutboundController {
     @GetMapping
     public String redirectToList(HttpSession session) {
 
-        Long memberId = (Long) session.getAttribute("loginMemberId");
+
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
+
         if (memberId == null) {
             return "redirect:/login";
         }
@@ -47,7 +51,8 @@ public class OutboundController {
                                   @RequestParam(required = false) String status,
                                   Model model) {
 
-        Long memberId = (Long) session.getAttribute("loginMemberId");
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
         if (memberId == null) {
             return "redirect:/login";
         }
@@ -69,7 +74,8 @@ public class OutboundController {
     @GetMapping("/request/form") // /member/outbound/request/form
     public String getOutboundRequestForm(HttpSession session, Model model) {
 
-        Long memberId = (Long) session.getAttribute("loginMemberId");
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
         if (memberId == null) {
             return "redirect:/login";
         }
@@ -88,7 +94,8 @@ public class OutboundController {
     public String createOutboundRequest(HttpSession session,
                                         @ModelAttribute OutboundDTO outboundDTO) {
 
-        Long memberId = (Long) session.getAttribute("loginMemberId");
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
         if (memberId == null) return "redirect:/login";
 
         outboundDTO.setMemberId(memberId);
@@ -114,7 +121,8 @@ public class OutboundController {
             @PathVariable Long outboundRequestId,
             HttpSession session) {
 
-        Long memberId = (Long) session.getAttribute("loginMemberId");
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
         if (memberId == null) return ResponseEntity.status(401).build();
 
         log.info("출고 요청 상세 조회 - outboundRequestId: {}", outboundRequestId);
@@ -134,7 +142,8 @@ public class OutboundController {
             HttpSession session,
             @RequestBody OutboundDTO dto) {
 
-        Long memberId = (Long) session.getAttribute("loginMemberId");
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
         if (memberId == null) return ResponseEntity.status(401).build();
 
         log.info("출고 요청 수정 - outboundRequestId={}, memberId={}",
@@ -155,7 +164,8 @@ public class OutboundController {
             @PathVariable Long outboundRequestId,
             HttpSession session) {
 
-        Long memberId = (Long) session.getAttribute("loginMemberId");
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        Long memberId = memberDTO.getMemberId();
         if (memberId == null) return ResponseEntity.status(401).build();
 
         log.info("출고 요청 삭제 - outboundRequestId={}, memberId={}",
@@ -178,13 +188,21 @@ public class OutboundController {
     // ======================================================
     @GetMapping("/products/byCategory")
     @ResponseBody
-    public List<ProductDTO> getProductsByPartner(
+    public ResponseEntity<?> getProductsByPartner(
             @RequestParam Integer categoryCd,
             HttpSession session) {
 
-        Integer partnerId = 1;  // TODO: 실제 세션 사용시 수정
+        MemberDTO memberDTO = (MemberDTO) session.getAttribute("loginMember");
+        if (memberDTO == null) {
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        }
 
-        return productService.getProductsByPartnerAndCategory(partnerId, categoryCd);
+        Integer partnerId = memberDTO.getPartnerId(); // 로그인한 회원의 파트너 ID
+
+        List<ProductDTO> products =
+                productService.getProductsByPartnerAndCategory(partnerId, categoryCd);
+
+        return ResponseEntity.ok(products);
     }
 
 }

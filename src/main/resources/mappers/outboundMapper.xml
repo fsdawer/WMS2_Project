@@ -95,11 +95,18 @@
         INNER JOIN Member M ON sr.member_id = M.member_id
         INNER JOIN Partner Pt ON M.partner_id = Pt.partner_id
         WHERE sr.member_id = #{memberId}
-        <if test="status != null">
-            AND sr.approvedStatus = #{status}
+
+        <if test="status != null and status != ''">
+            AND (
+            (sr.approvedStatus = 'APPROVED' AND #{status} = '승인')
+            OR (sr.approvedStatus = 'PENDING' AND #{status} = '승인대기')
+            OR (sr.approvedStatus = 'COMPANION' AND #{status} = '반려')
+            )
         </if>
-        ORDER BY sr.outboundDate DESC , sr.outboundRequest_ID DESC
+
+        ORDER BY sr.outboundRequest_ID DESC
     </select>
+
 
     <!-- ✅ 특정 사용자 출고요청 목록 조회 -->
     <select id="selectOutboundRequestByUserId" resultMap="OutboundRequestListMap">
@@ -118,10 +125,15 @@
         INNER JOIN Member m ON sr.member_id = m.member_id
         INNER JOIN Partner p ON p.partner_id = m.partner_id
         WHERE m.member_id = #{memberId}
+
         <if test="status != null and status != ''">
             AND sr.approvedStatus = #{status}
         </if>
+
+        ORDER BY sr.outboundRequest_ID DESC
     </select>
+
+
 
     <!-- ✅ 출고 품목 조회 -->
     <select id="getOutboundRequestItems" resultType="com.ssg.wms.outbound.domain.dto.OutboundItemDTO">

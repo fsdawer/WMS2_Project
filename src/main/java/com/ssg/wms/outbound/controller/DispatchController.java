@@ -22,6 +22,7 @@ public class DispatchController {
 
     /** 로그인 여부 체크 */
     private boolean isLoggedIn(HttpSession session) {
+
         return session.getAttribute("loginId") != null;
     }
 
