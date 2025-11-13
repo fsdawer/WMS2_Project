@@ -155,7 +155,7 @@
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item">
-                            <a href="html/pages-account-settings-account.html" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/inbound/member/request" class="menu-link">
                                 <div data-i18n="Account">요청 작성</div>
                             </a>
                         </li>

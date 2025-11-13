@@ -175,24 +175,24 @@
                     </ul>
                 </li>
 
-                <li class="menu-item ${(pageActive == 'stock_list' || pageActive == 'physical_inventory' || pageActive == 'sotck_product_list') ? 'active open' : ''}">
+                <li class="menu-item ${(pageActive == 'stock_list' || pageActive == 'physical_inventory' || pageActive == 'product_list') ? 'active open' : ''}">
                     <a href="javascript:void(0);" class="menu-link menu-toggle">
                         <i class="menu-icon tf-icons bx bx-package"></i>
                         <div data-i18n="Stock">재고 관리</div>
                     </a>
                     <ul class="menu-sub">
                         <li class="menu-item ${pageActive == 'stock_list' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/stock/search" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/stock/list" class="menu-link">
                                 <div data-i18n="Stock List">재고 조회</div>
                             </a>
                         </li>
                         <li class="menu-item ${pageActive == 'physical_inventory' ? 'active' : ''}">
-                            <a href="${pageContext.request.contextPath}/physical_inventory" class="menu-link">
+                            <a href="${pageContext.request.contextPath}/physical-inventory" class="menu-link">
                                 <div data-i18n="Stock Inspection">재고 실사</div>
                             </a>
                         </li>
-                        <li class="menu-item ${pageActive == 'sotck_product_list' ? 'active' : ''}">
-                            <a href="#" class="menu-link">
+                        <li class="menu-item ${pageActive == 'product_list' ? 'active' : ''}">
+                            <a href="${pageContext.request.contextPath}/productList/plist" class="menu-link">
                                 <div data-i18n="Product Status">품목 현황</div>
                             </a>
                         </li>
