@@ -471,3 +471,12 @@ CREATE TABLE Sales
 ) COMMENT '매출 관리 테이블';
 
 ##############################
+
+-- 1. 기존 DB가 있다면 삭제 (모든 테이블과 데이터가 삭제됨)
+DROP DATABASE IF EXISTS wmstestdb;
+
+-- 2. V4 DDL을 적용할 깨끗한 DB를 다시 생성
+CREATE DATABASE wmstestdb DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+
+-- 3. 새로 만든 DB를 사용
+USE wmstestdb;
