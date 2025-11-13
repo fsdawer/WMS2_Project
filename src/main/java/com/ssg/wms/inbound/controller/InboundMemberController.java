@@ -4,6 +4,7 @@ import com.ssg.wms.inbound.dto.InboundDTO;
 import com.ssg.wms.inbound.dto.InboundDetailDTO;
 import com.ssg.wms.inbound.dto.InboundListDTO;
 import com.ssg.wms.inbound.dto.InboundRequestDTO;
+import com.ssg.wms.member.dto.MemberDTO;
 import com.ssg.wms.product_ehs.dto.CategoryDTO;
 import com.ssg.wms.product_ehs.dto.ProductDTO;
 import com.ssg.wms.inbound.service.InboundMemberService;
@@ -39,11 +40,12 @@ public class InboundMemberController {
     // 입고 요청 화면 이동
     @GetMapping("/request")
     public String getInboundRequestForm(
-//            HttpSession session,
+            HttpSession session,
             Model model) {
         // 로그인한 사용자의 user_id를 자동으로 가져오도록
-        Long memberId = 1L;  // Integer → Long으로 변경!
-//        Long memberId = (Long) session.getAttribute("loginMemberId");
+//        Long memberId = 1L;  // Integer → Long으로 변경!
+//        MemberDTO memberDTO = session.getAttribute("loginMember");
+        Long memberId = (Long) session.getAttribute("loginMemberId");
 //        String memberName = (String) session.getAttribute("loginMemberName");
         String memberName = "엄홍길";
         model.addAttribute("memberId", memberId);
