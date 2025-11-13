@@ -76,33 +76,6 @@
       cursor: pointer;
     }
 
-    /*!* ----- [페이징 스타일] ----- *!*/
-    /*.pagination-container {*/
-    /*  display: flex;*/
-    /*  justify-content: center;*/
-    /*  margin-top: 20px;*/
-    /*  margin-bottom: 30px;*/
-    /*}*/
-    /*.pagination-link {*/
-    /*  color: #5a5f78;*/
-    /*  float: left;*/
-    /*  padding: 8px 16px;*/
-    /*  text-decoration: none;*/
-    /*  border: 1px solid #ddd;*/
-    /*  margin: 0 4px;*/
-    /*  border-radius: 4px;*/
-    /*  transition: background-color 0.3s;*/
-    /*}*/
-    /*.pagination-link.active {*/
-    /*  background-color: #5a5f78;*/
-    /*  color: white;*/
-    /*  border: 1px solid #5a5f78;*/
-    /*}*/
-    /*.pagination-link:hover:not(.active) {*/
-    /*  background-color: #f1f1f1;*/
-    /*}*/
-
-
     @media (max-width: 768px) {
 
       .page-wrapper {
@@ -128,12 +101,6 @@
         height: 300px;
       }
 
-      /*!* 페이징 버튼 크기 조정 *!*/
-      /*.pagination-link {*/
-      /*  padding: 6px 10px;*/
-      /*  font-size: 0.9em;*/
-      /*}*/
-
       /* 헤더 폰트 크기 조정 */
       h1 {
         font-size: 1.5em;
@@ -145,9 +112,11 @@
 <div class="page-wrapper">
   <h1>창고 목록 및 위치 조회</h1>
 
-  <button onclick="location.href='${pageContext.request.contextPath}/admin/warehouses/register'" class="register-btn">
-    새로운 창고 등록
-  </button>
+  <c:if test="${userRole == 'ADMIN'}">
+    <button onclick="location.href='${pageContext.request.contextPath}/admin/warehouses/register'" class="register-btn">
+      새로운 창고 등록
+    </button>
+  </c:if>
 
   <div id="map"></div>
 
@@ -163,13 +132,27 @@
       </tr>
       </thead>
       <tbody>
-      <c:forEach var="warehouse" items="${warehouseList}">
+
+      <%-- 1. [목록 통합] 두 가지 변수명 중 존재하는 데이터를 displayList에 설정 --%>
+      <c:set var="displayList" value="${tableWarehouseList != null ? tableWarehouseList : warehouseList}" />
+
+      <c:forEach var="warehouse" items="${displayList}">
         <tr>
           <td>${warehouse.warehouseId}</td>
           <td>
-            <a href="${pageContext.request.contextPath}/admin/warehouses/${warehouse.warehouseId}">
-                ${warehouse.name}
-            </a>
+              <%-- 2. [권한 분기] 역할에 따라 상세 조회 URL 분기 --%>
+            <c:choose>
+              <c:when test="${userRole == 'ADMIN'}">
+                <a href="${pageContext.request.contextPath}/admin/warehouses/${warehouse.warehouseId}">
+                    ${warehouse.name}
+                </a>
+              </c:when>
+              <c:otherwise>
+                <a href="${pageContext.request.contextPath}/member/warehouses/${warehouse.warehouseId}">
+                    ${warehouse.name}
+                </a>
+              </c:otherwise>
+            </c:choose>
           </td>
           <td>${warehouse.address}</td>
           <td>${warehouse.warehouseType}</td>
@@ -181,49 +164,43 @@
           </td>
         </tr>
       </c:forEach>
-      <c:if test="${empty warehouseList}">
+      <c:if test="${empty displayList}">
         <tr>
           <td colspan="5">등록된 창고가 없습니다.</td>
         </tr>
       </c:if>
       </tbody>
     </table>
-<%--  </div>--%>
-<%--  <div class="pagination-container">--%>
-<%--    <a href="#" class="pagination-link">&laquo;</a>--%>
-<%--    <a href="#" class="pagination-link">1</a>--%>
-<%--    <a href="#" class="pagination-link active">2</a>--%>
-<%--    <a href="#" class="pagination-link">3</a>--%>
-<%--    <a href="#" class="pagination-link">4</a>--%>
-<%--    <a href="#" class="pagination-link">&raquo;</a>--%>
-<%--  </div>--%>
-<%--</div>--%>
+  </div>
+</div>
 
 <script type="text/javascript">
-  // 서버에서 전달한 warehouseList JSON 데이터를 JS 객체로 변환
-  var jsonString = '${jsWarehouseData}';
+  // 3. [지도 데이터 통합] jsWarehouseData가 없으면 displayList를 대체 소스로 사용
+  var warehouseListForJs = '${jsWarehouseData}';
+  if (warehouseListForJs.trim().length === 0 || warehouseListForJs === '[]') {
+    // jsWarehouseData가 비어있는 경우, 테이블에 사용된 목록을 사용
+    warehouseListForJs = '${displayList}';
+  }
+
+  var jsonString = warehouseListForJs;
   var warehouseData = [];
+
   try {
-    if (jsonString && jsonString.trim().length > 0) {
+    if (jsonString && jsonString.trim().length > 0 && jsonString !== '[]') {
       // JSON 파싱 시 'jsWarehouseData' 변수에 유효한 JSON 문자열이 담겨야 합니다.
-      warehouseData = JSON.parse(jsonString.replace(/&quot;/g, '"')); // 혹시 모를 HTML 엔티티 치환 처리
+      warehouseData = JSON.parse(jsonString.replace(/&quot;/g, '"'));
 
-//오름차순 내림차순 지정 기능
+      //오름차순 내림차순 지정 기능
       warehouseData.sort(function(a, b) {
-        // ID를 숫자로 변환하여 비교합 (b - a 이면 내림차순)
-
         var idA = Number(a.warehouseId);
         var idB = Number(b.warehouseId);
-
-        // 유효한 숫자가 아닐 경우를 대비하여 0을 기본값으로 사용
         return (idA || 0) - (idB || 0);
       });
-
-      // -------------------------------------------------------------
-
     }
   } catch(e) {
     console.error("창고 데이터 JSON 파싱 오류:", e);
+    // 오류가 발생해도 지도 로딩은 계속 진행 (데이터는 비어있음)
+    warehouseData = [];
   }
 
   // 카카오 지도 로드 및 초기화
@@ -256,7 +233,6 @@
         var marker = new kakao.maps.Marker({ position: position, map: map });
 
         // 2. CustomOverlay로 창고 이름 표시 (마커 위에 바로 보이게 함)
-        // yAnchor: 1 은 마커의 바로 위에 오버레이가 위치하도록 설정합니다.
         var overlay = new kakao.maps.CustomOverlay({
           position: position,
           content: `<div class="marker-label">${wh.name}</div>`,
@@ -293,5 +269,4 @@
   });
 </script>
 </body>
-</html>
 <%@ include file="../admin/admin-footer.jsp" %>

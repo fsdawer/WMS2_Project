@@ -43,7 +43,7 @@ public class WarehouseAdminController {
         this.objectMapper = objectMapper;
     }
 
-    // ------------------- 1. View Controller (화면 로드 및 폼 처리) -------------------
+    // - 1. View Controlle
 
     @GetMapping({"", "/location"})
     public String adminListIndex(
@@ -54,6 +54,7 @@ public class WarehouseAdminController {
         // **[세션/권한 적용]**: 관리자 권한 확인
         String auth = validateAdminAccess(session);
         if (auth != null) return auth;
+        // 도윤님 검사맡기
 
         List<WarehouseListDTO> list = warehouseAdminService.findWarehouses(searchForm);
         model.addAttribute("warehouseList", list);
@@ -175,7 +176,7 @@ public class WarehouseAdminController {
             RedirectAttributes redirectAttributes,
             HttpSession session) {
 
-        // **[세션/권한 적용]**: 관리자 권한 확인
+        //*[세션 관리자 권한 확인
         String auth = validateAdminAccess(session);
         if (auth != null) return auth;
 
@@ -201,7 +202,7 @@ public class WarehouseAdminController {
             RedirectAttributes redirectAttributes,
             HttpSession session) { // HttpSession 추가
 
-        // **[세션/권한 적용]**: 관리자 권한 확인 및 리다이렉트
+        /// 세션확인
         String auth = validateAdminAccess(session);
         if (auth != null) return auth;
 
@@ -234,7 +235,7 @@ public class WarehouseAdminController {
             RedirectAttributes redirectAttributes,
             HttpSession session) { // 세션 추가
 
-        // **[세션/권한 적용]**: 관리자 권한 확인
+        /// 세션/권한 적용: 관리자 권한 확인
         String auth = validateAdminAccess(session);
         if (auth != null) return auth;
 
@@ -256,13 +257,8 @@ public class WarehouseAdminController {
         return warehouseAdminService.checkNameDuplication(name);
     }
 
-    // ------------------- 2. 관리자 접근 권한 검사 헬퍼 메서드 -------------------
+    //2. 관리자 접근 권한 검사 헬퍼 메서드
 
-    /**
-     * 로그인 및 ADMIN 권한을 확인하고, 권한이 없을 경우 리다이렉트 경로를 반환합니다.
-     * @param session 현재 HttpSession
-     * @return 권한이 없을 경우 리다이렉트 경로 (예: "redirect:/login"), 통과 시 null
-     */
     private String validateAdminAccess(HttpSession session) {
         if (!isLoggedIn(session)) {
             // 로그인 안 됨 → /login
@@ -275,17 +271,17 @@ public class WarehouseAdminController {
         return null; // 통과
     }
 
-    /**
-     * 세션에서 ADMIN 권한을 가지고 있는지 체크합니다.
-     */
+
+     ///세션에서 ADMIN 권한을 가지고 있는지 체크합니다.
+
     private boolean isAdmin(HttpSession session) {
         Object role = session.getAttribute("role");
         return role != null && role.equals(Role.ADMIN);
     }
 
-    /**
-     * 세션에서 로그인 상태인지 체크합니다.
-     */
+
+     /// 세션에서 로그인 상태인지 체크합니다.
+
     private boolean isLoggedIn(HttpSession session) {
         return session.getAttribute("loginId") != null;
     }
