@@ -26,43 +26,72 @@ public class outboundOrderController {
 
     private final OutboundOrderService outboundOrderService;
 
+    /** ADMIN 권한 체크 */
     private boolean isAdmin(HttpSession session) {
         Object role = session.getAttribute("role");
         return role != null && role.equals(Role.ADMIN);
     }
 
+    /** 세션에서 로그인했는지 체크 */
+    private boolean isLoggedIn(HttpSession session) {
+        return session.getAttribute("loginId") != null;
+    }
+
+    /**
+     * 로그인 안 됨 → /member/login
+     * 로그인됨 + ADMIN 아님 → /error/403
+     */
+    private String validateAdminAccess(HttpSession session) {
+        if (!isLoggedIn(session)) {
+            return "redirect:/login";   // 로그인 안 했으면 로그인 페이지로
+        }
+        if (!isAdmin(session)) {
+            return "redirect:/error/403";       // 로그인 했지만 ADMIN 아님
+        }
+        return null; // 통과
+    }
+
+
+    // =======================
+    // 출고 지시서 리스트 조회
+    // =======================
     @GetMapping
     public String getOutboundOrderList(Criteria criteria,
                                        @RequestParam(required = false) String filterType,
                                        HttpSession session,
                                        Model model) {
 
-        if (!isAdmin(session)) return "redirect:/error/403";
+        String auth = validateAdminAccess(session);
+        if (auth != null) return auth;
 
         List<OutboundOrderDTO> list = outboundOrderService.getAllRequests(criteria, filterType);
         model.addAttribute("outboundOrders", list);
-        return "/outbound/admin/outboundOrderList";
+
+        return "outbound/admin/outboundOrderList";
     }
 
 
-
-
+    // =======================
+    // 배차/요청상태 등록 폼
+    // =======================
     @GetMapping("/{instructionId}/dispatch-form")
-    public String getDispatchForm(@PathVariable("instructionId") Long instructionId, Model model, HttpSession session) {
-        log.info("🚚 [모달폼 요청] instructionId={}", instructionId);
+    public String getDispatchForm(@PathVariable("instructionId") Long instructionId,
+                                  Model model,
+                                  HttpSession session) {
 
-        if (!isAdmin(session)) return "redirect:/error/403";
+        String auth = validateAdminAccess(session);
+        if (auth != null) return auth;
 
         OutboundOrderDTO detail = outboundOrderService.getRequestDetailById(instructionId);
-        log.info("✅ 조회된 데이터: {}", detail);
-
         model.addAttribute("dispatch", detail);
 
         return "outbound/admin/dispatchForm";
     }
 
 
-
+    // =======================
+    // 배차 등록 (JSON)
+    // =======================
     @PostMapping("/{instructionId}/register")
     @ResponseBody
     public ResponseEntity<String> registerDispatch(
@@ -70,70 +99,65 @@ public class outboundOrderController {
             @RequestBody OutboundOrderDTO dto,
             HttpSession session) {
 
-        if (!isAdmin(session)) return ResponseEntity.status(403).build();
+        if (!isLoggedIn(session))
+            return ResponseEntity.status(401).body("로그인이 필요합니다.");
+        if (!isAdmin(session))
+            return ResponseEntity.status(403).body("관리자 권한이 필요합니다.");
 
-        log.info("✅ 배차 등록 요청: instructionId={}, dto={}", instructionId, dto);
+        log.info("배차 등록 요청: instructionId={}, dto={}", instructionId, dto);
 
         try {
-            // ✅ 1. 중복 승인 체크
             OutboundOrderDTO existingOrder = outboundOrderService.getRequestDetailById(instructionId);
 
             if ("승인".equals(existingOrder.getApprovedStatus())) {
-                log.warn("⚠️ 이미 승인된 출고지시서: instructionId={}", instructionId);
                 return ResponseEntity.status(HttpStatus.CONFLICT)
                         .body("이미 승인된 건입니다.");
             }
 
-            // ✅ 2. 적재량 초과 체크
             if (dto.getLoadedBox() > dto.getMaximumBOX()) {
-                log.warn("❌ 적재량 초과: {}박스 > {}박스",
-                        dto.getLoadedBox(),
-                        dto.getMaximumBOX());
                 return ResponseEntity.badRequest()
                         .body("출고 박스 수가 최대 적재량을 초과했습니다.");
             }
 
-            // ✅ 3. 배차 등록 진행
             dto.setApprovedOrderID(instructionId);
             outboundOrderService.updateOrderStatus(dto);
 
-            log.info("✅ 배차 등록 성공: instructionId={}", instructionId);
             return ResponseEntity.ok("success");
 
         } catch (Exception e) {
-            log.error("❌ 배차 등록 실패: instructionId={}", instructionId, e);
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+            log.error("배차 등록 실패", e);
+            return ResponseEntity.status(500)
                     .body("error: " + e.getMessage());
         }
     }
 
 
-//  출고지시서 승인 상태 조회 (중복 승인 방지)
-@GetMapping("/{instructionId}/status")
-@ResponseBody
-public ResponseEntity<Map<String, String>> checkApprovalStatus(
-        @PathVariable("instructionId") Long instructionId,
-        HttpSession session) {
+    // =======================
+    // 승인 상태 조회
+    // =======================
+    @GetMapping("/{instructionId}/status")
+    @ResponseBody
+    public ResponseEntity<Map<String, String>> checkApprovalStatus(
+            @PathVariable("instructionId") Long instructionId,
+            HttpSession session) {
 
-    if (!isAdmin(session)) return ResponseEntity.status(403).build();
+        if (!isLoggedIn(session))
+            return ResponseEntity.status(401).build();
+        if (!isAdmin(session))
+            return ResponseEntity.status(403).build();
 
-    log.info("✅ 승인 상태 조회: instructionId={}", instructionId);
+        try {
+            OutboundOrderDTO order = outboundOrderService.getRequestDetailById(instructionId);
 
-    try {
-        OutboundOrderDTO order = outboundOrderService.getRequestDetailById(instructionId);
+            Map<String, String> response = new HashMap<>();
+            response.put("approvedStatus", order.getApprovedStatus());
+            response.put("approvedOrderId", String.valueOf(instructionId));
 
-        Map<String, String> response = new HashMap<>();
-        response.put("approvedStatus", order.getApprovedStatus());
-        response.put("approvedOrderId", String.valueOf(instructionId));
+            return ResponseEntity.ok(response);
 
-        log.info("✅ 현재 승인 상태: {}", order.getApprovedStatus());
-        return ResponseEntity.ok(response);
-
-    } catch (Exception e) {
-        log.error("❌ 승인 상태 조회 실패", e);
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                .body(Collections.singletonMap("error", "상태 조회 실패"));
+        } catch (Exception e) {
+            return ResponseEntity.status(500)
+                    .body(Collections.singletonMap("error", "상태 조회 실패"));
+        }
     }
 }
-}
-
