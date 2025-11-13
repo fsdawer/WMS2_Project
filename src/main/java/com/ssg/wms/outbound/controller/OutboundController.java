@@ -61,7 +61,6 @@ public String getAllOutboundRequests(
     @GetMapping("/list")
     public String getOutboundList(@RequestParam Long memberId,
                                   @RequestParam(required = false) String status,
-                                  Criteria criteria,
                                   Model model) {
         if (memberId == null) {
             return "redirect:/login";
@@ -71,7 +70,7 @@ public String getAllOutboundRequests(
 
         model.addAttribute("outboundList", outboundList);
         model.addAttribute("memberId", memberId);
-        return "outbound/member/outboundList"; // 📄 /WEB-INF/views/outbound/member/outboundList.jsp
+        return "outbound/member/outboundList"; // /WEB-INF/views/outbound/member/outboundList.jsp
     }
 
 

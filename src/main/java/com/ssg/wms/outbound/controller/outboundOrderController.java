@@ -1,5 +1,6 @@
 package com.ssg.wms.outbound.controller;
 
+import com.ssg.wms.common.Role;
 import com.ssg.wms.outbound.domain.Criteria;
 import com.ssg.wms.outbound.domain.dto.OutboundOrderDTO;
 import com.ssg.wms.outbound.service.OutboundOrderService;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -24,10 +26,19 @@ public class outboundOrderController {
 
     private final OutboundOrderService outboundOrderService;
 
+    private boolean isAdmin(HttpSession session) {
+        Object role = session.getAttribute("role");
+        return role != null && role.equals(Role.ADMIN);
+    }
+
     @GetMapping
     public String getOutboundOrderList(Criteria criteria,
                                        @RequestParam(required = false) String filterType,
+                                       HttpSession session,
                                        Model model) {
+
+        if (!isAdmin(session)) return "redirect:/error/403";
+
         List<OutboundOrderDTO> list = outboundOrderService.getAllRequests(criteria, filterType);
         model.addAttribute("outboundOrders", list);
         return "/outbound/admin/outboundOrderList";
@@ -37,8 +48,10 @@ public class outboundOrderController {
 
 
     @GetMapping("/{instructionId}/dispatch-form")
-    public String getDispatchForm(@PathVariable("instructionId") Long instructionId, Model model) {
+    public String getDispatchForm(@PathVariable("instructionId") Long instructionId, Model model, HttpSession session) {
         log.info("🚚 [모달폼 요청] instructionId={}", instructionId);
+
+        if (!isAdmin(session)) return "redirect:/error/403";
 
         OutboundOrderDTO detail = outboundOrderService.getRequestDetailById(instructionId);
         log.info("✅ 조회된 데이터: {}", detail);
@@ -54,7 +67,10 @@ public class outboundOrderController {
     @ResponseBody
     public ResponseEntity<String> registerDispatch(
             @PathVariable("instructionId") Long instructionId,
-            @RequestBody OutboundOrderDTO dto) {
+            @RequestBody OutboundOrderDTO dto,
+            HttpSession session) {
+
+        if (!isAdmin(session)) return ResponseEntity.status(403).build();
 
         log.info("✅ 배차 등록 요청: instructionId={}, dto={}", instructionId, dto);
 
@@ -96,7 +112,10 @@ public class outboundOrderController {
 @GetMapping("/{instructionId}/status")
 @ResponseBody
 public ResponseEntity<Map<String, String>> checkApprovalStatus(
-        @PathVariable("instructionId") Long instructionId) {
+        @PathVariable("instructionId") Long instructionId,
+        HttpSession session) {
+
+    if (!isAdmin(session)) return ResponseEntity.status(403).build();
 
     log.info("✅ 승인 상태 조회: instructionId={}", instructionId);
 
