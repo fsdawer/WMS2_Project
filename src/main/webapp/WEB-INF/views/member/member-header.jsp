@@ -175,12 +175,7 @@
                     <ul class="menu-sub">
                         <li class="menu-item">
                             <a href="${pageContext.request.contextPath}/member/outbound/list" class="menu-link">
-                                <div data-i18n="Account">요청 작성</div>
-                            </a>
-                        </li>
-                        <li class="menu-item">
-                            <a href="#" class="menu-link">
-                                <div data-i18n="Account">요청 조회/수정/취소</div>
+                                <div data-i18n="Account">요청 관리</div>
                             </a>
                         </li>
                     </ul>
